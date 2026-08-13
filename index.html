@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ESP32 Konum</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+      background: #f3f3f3;
+    }
+
+    .kart {
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      max-width: 400px;
+      margin: auto;
+    }
+
+    button {
+      padding: 16px 25px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="kart">
+
+  <h1>📍 ESP32 Konum</h1>
+
+  <p id="durum">Konum alınmaya hazır.</p>
+
+  <button onclick="konumAl()">
+    Konumumu Bul ve ESP32'ye Gönder
+  </button>
+
+</div>
+
+<script>
+
+function konumAl() {
+
+  document.getElementById("durum").innerHTML =
+    "📡 Konum aranıyor...";
+
+  navigator.geolocation.getCurrentPosition(
+
+    function(position) {
+
+      let lat = position.coords.latitude;
+      let lon = position.coords.longitude;
+      let acc = position.coords.accuracy;
+
+      document.getElementById("durum").innerHTML =
+        "✅ Konum bulundu!";
+
+      let adres =
+        "http://172.20.10.2/konum?lat=" +
+        encodeURIComponent(lat) +
+        "&lon=" +
+        encodeURIComponent(lon) +
+        "&acc=" +
+        encodeURIComponent(acc);
+
+      window.location.href = adres;
+    },
+
+    function(error) {
+
+      document.getElementById("durum").innerHTML =
+        "❌ Konum alınamadı. Hata: " + error.code;
+
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+
+  );
+}
+
+</script>
+
+</body>
+</html>
