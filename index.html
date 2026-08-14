@@ -154,6 +154,32 @@ function hedefSec() {
       const hedefLat = e.latlng.lat;
       const hedefLon = e.latlng.lng;
 
+      let hedefAdi = "Seçilen konum";
+
+fetch(
+  "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" +
+  encodeURIComponent(hedefLat) +
+  "&lon=" +
+  encodeURIComponent(hedefLon)
+)
+  .then(response => response.json())
+  .then(data => {
+
+    if (data && data.display_name) {
+      hedefAdi = data.display_name;
+    }
+
+    document.getElementById("hedefDurum").innerHTML =
+      "🎯 Hedef: " + hedefAdi;
+
+  })
+  .catch(() => {
+
+    document.getElementById("hedefDurum").innerHTML =
+      "📍 Hedef seçildi";
+
+  });
+
       if (hedefMarker) {
         harita.removeLayer(hedefMarker);
       }
@@ -169,7 +195,15 @@ function hedefSec() {
     "&hedefLon=" +
     encodeURIComponent(hedefLon);
 
-window.location.href = hedefAdres;
+fetch(hedefAdres, { mode: "no-cors" })
+  .then(() => {
+    document.getElementById("hedefDurum").innerHTML =
+      "✅ Hedef ESP32'ye gönderildi!";
+  })
+  .catch(() => {
+    document.getElementById("hedefDurum").innerHTML =
+      "❌ Hedef gönderilemedi!";
+  });
     });
   }
 
