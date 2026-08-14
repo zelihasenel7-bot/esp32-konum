@@ -169,15 +169,7 @@ function hedefSec() {
     "&hedefLon=" +
     encodeURIComponent(hedefLon);
 
-fetch(hedefAdres)
-    .then(() => {
-        document.getElementById("hedefDurum").innerHTML =
-            "✅ Hedef ESP32'ye gönderildi!";
-    })
-    .catch(() => {
-        document.getElementById("hedefDurum").innerHTML =
-            "❌ Hedef ESP32'ye gönderilemedi!";
-    });
+window.location.href = hedefAdres;
     });
   }
 
