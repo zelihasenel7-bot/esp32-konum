@@ -9,6 +9,10 @@
 
   <title>ESP32 Konum</title>
 
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <style>
 
     body {
@@ -56,6 +60,14 @@
   <button onclick="konumAl()">
     Konumumu Bul ve ESP32'ye Gönder
   </button>
+
+  <br><br>
+
+<button onclick="hedefSec()">🎯 Hedef Seç</button>
+
+<div id="harita" style="display:none; height:350px; margin-top:20px;"></div>
+
+<p id="hedefDurum"></p>
 
 </div>
 
@@ -118,6 +130,44 @@ encodeURIComponent(saat);
     }
 
   );
+}
+
+  let harita;
+let hedefMarker;
+
+function hedefSec() {
+
+  const haritaDiv = document.getElementById("harita");
+  haritaDiv.style.display = "block";
+
+  if (!harita) {
+
+    harita = L.map("harita").setView([39.93, 32.85], 12);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap"
+    }).addTo(harita);
+
+    harita.on("click", function(e) {
+
+      const hedefLat = e.latlng.lat;
+      const hedefLon = e.latlng.lng;
+
+      if (hedefMarker) {
+        harita.removeLayer(hedefMarker);
+      }
+
+      hedefMarker = L.marker([hedefLat, hedefLon]).addTo(harita);
+
+      document.getElementById("hedefDurum").innerHTML =
+        "📍 Hedef seçildi!";
+    });
+  }
+
+  setTimeout(function() {
+    harita.invalidateSize();
+  }, 200);
 }
 
 </script>
