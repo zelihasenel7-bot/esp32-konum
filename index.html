@@ -83,6 +83,8 @@ function konumAl() {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
       const acc = position.coords.accuracy;
+      const simdi = new Date();
+const saat = simdi.toLocaleTimeString("tr-TR");
 
       document.getElementById("durum").innerHTML =
         "✅ Konum bulundu! ESP32'ye gönderiliyor...";
@@ -93,7 +95,9 @@ function konumAl() {
         "&lon=" +
         encodeURIComponent(lon) +
         "&acc=" +
-        encodeURIComponent(acc);
+encodeURIComponent(acc) +
+"&saat=" +
+encodeURIComponent(saat);
 
       window.location.href = adres;
     },
