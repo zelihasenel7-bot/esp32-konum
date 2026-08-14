@@ -72,11 +72,7 @@ function konumAl() {
         "&acc=" +
         encodeURIComponent(acc);
 
-      fetch(adres, { mode: "no-cors" });
-
-document.getElementById("durum").innerHTML =
-  "✅ Konum ESP32'ye gönderildi!<br><br>" +
-  "<button onclick='konumAl()'>📍 Tekrar Konum Gönder</button>";
+window.location.href = adres;
 
     function(error) {
 
