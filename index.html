@@ -162,6 +162,22 @@ function hedefSec() {
 
       document.getElementById("hedefDurum").innerHTML =
         "📍 Hedef seçildi!";
+
+      const hedefAdres =
+    "http://172.20.10.2/hedef?hedefLat=" +
+    encodeURIComponent(hedefLat) +
+    "&hedefLon=" +
+    encodeURIComponent(hedefLon);
+
+fetch(hedefAdres)
+    .then(() => {
+        document.getElementById("hedefDurum").innerHTML =
+            "✅ Hedef ESP32'ye gönderildi!";
+    })
+    .catch(() => {
+        document.getElementById("hedefDurum").innerHTML =
+            "❌ Hedef ESP32'ye gönderilemedi!";
+    });
     });
   }
 
