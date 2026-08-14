@@ -177,6 +177,12 @@ window.location.href = hedefAdres;
     harita.invalidateSize();
   }, 200);
 }
+  const params = new URLSearchParams(window.location.search);
+
+if (params.get("hedef") === "ok") {
+  document.getElementById("hedefDurum").innerHTML =
+    "✅ Hedef kaydedildi!";
+}
 
 </script>
 
