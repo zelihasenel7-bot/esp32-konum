@@ -185,7 +185,7 @@ const espHedefAdres =
   "&hedefLon=" +
   encodeURIComponent(hedefLon);
 
-fetch(espHedefAdres, { mode: "no-cors" });
+window.location.href = espHedefAdres;
       
       if (hedefMarker) {
         harita.removeLayer(hedefMarker);
