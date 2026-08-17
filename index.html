@@ -154,6 +154,7 @@ function hedefSec() {
       const hedefLat = e.latlng.lat;
       const hedefLon = e.latlng.lng;
 
+
       let hedefAdi = "Seçilen konum";
 
 fetch(
@@ -162,24 +163,30 @@ fetch(
   "&lon=" +
   encodeURIComponent(hedefLon)
 )
-  .then(response => response.json())
-  .then(data => {
+.then(response => response.json())
+.then(data => {
 
-    if (data && data.display_name) {
-      hedefAdi = data.display_name;
-    }
+  if (data && data.display_name) {
+    hedefAdi = data.display_name;
+  }
 
-    document.getElementById("hedefDurum").innerHTML =
-      "🎯 Hedef: " + hedefAdi;
+  document.getElementById("hedefDurum").innerHTML =
+    "🎯 Hedef: " + hedefAdi;
 
-  })
-  .catch(() => {
+})
+.catch(() => {
+  document.getElementById("hedefDurum").innerHTML =
+    "📍 Hedef seçildi";
+});
 
-    document.getElementById("hedefDurum").innerHTML =
-      "📍 Hedef seçildi";
+const espHedefAdres =
+  "http://172.20.10.2/hedef?hedefLat=" +
+  encodeURIComponent(hedefLat) +
+  "&hedefLon=" +
+  encodeURIComponent(hedefLon);
 
-  });
-
+fetch(espHedefAdres, { mode: "no-cors" });
+      
       if (hedefMarker) {
         harita.removeLayer(hedefMarker);
       }
@@ -189,21 +196,7 @@ fetch(
       document.getElementById("hedefDurum").innerHTML =
         "📍 Hedef seçildi!";
 
-      const hedefAdres =
-    "http://172.20.10.2/hedef?hedefLat=" +
-    encodeURIComponent(hedefLat) +
-    "&hedefLon=" +
-    encodeURIComponent(hedefLon);
-
-fetch(hedefAdres, { mode: "no-cors" })
-  .then(() => {
-    document.getElementById("hedefDurum").innerHTML =
-      "✅ Hedef ESP32'ye gönderildi!";
-  })
-  .catch(() => {
-    document.getElementById("hedefDurum").innerHTML =
-      "❌ Hedef gönderilemedi!";
-  });
+      
     });
   }
 
