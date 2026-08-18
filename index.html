@@ -315,8 +315,15 @@ return;
   const hedefLon = parseFloat(yer.lon);
   const hedefAdi = yer.display_name;
 
-  document.getElementById("hedefDurum").innerHTML =
-    "🎯 Seçilen hedef:<br>" + hedefAdi;
+  const kisaAdres = hedefAdi
+    .split(",")
+    .slice(0, 3)
+    .join(",");
+    
+localStorage.setItem("secilenHedefAdres", kisaAdres);
+
+document.getElementById("hedefDurum").innerHTML =
+    "🎯 <b>Seçilen Hedef</b><br>📍 " + kisaAdres;
 
   const espHedefAdres =
     "http://172.20.10.2/hedef?hedefLat=" +
@@ -460,11 +467,21 @@ window.location.href = espHedefAdres;
   const params = new URLSearchParams(window.location.search);
 
 if (params.get("hedef") === "ok") {
-  document.getElementById("hedefDurum").innerHTML =
-    "✅ Hedef kaydedildi!";
-  document.getElementById("hedefSecimAlani").style.display = "none";
-}
 
+    const kayitliAdres = localStorage.getItem("secilenHedefAdres");
+
+    if (kayitliAdres) {
+        document.getElementById("hedefDurum").innerHTML =
+            "✅ Hedef kaydedildi!<br><br>" +
+            "🎯 <b>Seçilen Hedef</b><br>" +
+            "📍 " + kayitliAdres;
+    } else {
+        document.getElementById("hedefDurum").innerHTML =
+            "✅ Hedef kaydedildi!";
+    }
+
+    document.getElementById("hedefSecimAlani").style.display = "none";
+}
 </script>
 
 </body>
