@@ -63,6 +63,8 @@
 
   <br><br>
 
+  <div id="hedefSecimAlani">
+
   <input
   type="text"
   id="hedefArama"
@@ -79,6 +81,8 @@
 <br><br>
 
 <button onclick="hedefSec()">🎯 Hedef Seç</button>
+
+</div>
 
 <div id="harita" style="display:none; height:350px; margin-top:20px;"></div>
 
@@ -460,6 +464,7 @@ window.location.href = espHedefAdres;
 if (params.get("hedef") === "ok") {
   document.getElementById("hedefDurum").innerHTML =
     "✅ Hedef kaydedildi!";
+  document.getElementById("hedefSecimAlani").style.display = "none";
 }
 
 </script>
