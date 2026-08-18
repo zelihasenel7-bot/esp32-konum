@@ -84,10 +84,119 @@
 
 <p id="hedefDurum"></p>
 
+  <hr>
+
+<h2>📍 Konum Geçmişi</h2>
+
+<button onclick="konumGecmisiniGetir()">
+  🕐 Konum Geçmişini Göster
+</button>
+
+<div id="konumGecmisi">
+  <p>Henüz konum geçmişi gösterilmedi.</p>
+</div>
+
 </div>
 
 
 <script>
+
+  async function konumGecmisiniGetir() {
+
+  const alan = document.getElementById("konumGecmisi");
+
+  alan.innerHTML = "⏳ Konum geçmişi yükleniyor...";
+
+  try {
+
+    const response = await fetch("http://172.20.10.2/gecmis");
+
+    const gecmis = await response.json();
+
+    if (gecmis.length === 0) {
+      alan.innerHTML = "📭 Henüz kayıtlı konum yok.";
+      return;
+    }
+
+    let html = "";
+
+    for (let i = gecmis.length - 1; i >= 0; i--) {
+
+      const kayit = gecmis[i];
+
+      let adres = "Konum";
+
+      try {
+
+        const adresResponse = await fetch(
+          "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" +
+          encodeURIComponent(kayit.lat) +
+          "&lon=" +
+          encodeURIComponent(kayit.lon)
+        );
+
+        const adresData = await adresResponse.json();
+
+        if (adresData && adresData.display_name) {
+          adres = adresData.display_name;
+        }
+
+      } catch (e) {
+        adres = "Adres alınamadı";
+      }
+
+      html +=
+        "<div style='margin:15px 0;padding:12px;border:1px solid #ccc;border-radius:10px;'>" +
+        "🕐 <b>" + kayit.saat + "</b><br>" +
+        "📍 " + adres + "<br><br>" +
+        "<button onclick='gecmisiHaritadaGoster(" +
+        kayit.lat + "," + kayit.lon +
+        ")'>🗺️ Haritada Göster</button>" +
+        "</div>";
+    }
+
+    alan.innerHTML = html;
+
+  } catch (error) {
+
+    alan.innerHTML =
+      "❌ Konum geçmişi ESP32'den alınamadı.";
+  }
+}
+
+
+function gecmisiHaritadaGoster(lat, lon) {
+
+  const haritaDiv = document.getElementById("harita");
+
+  haritaDiv.style.display = "block";
+
+  if (!harita) {
+
+    harita = L.map("harita").setView([lat, lon], 16);
+
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap"
+      }
+    ).addTo(harita);
+
+  } else {
+
+    harita.setView([lat, lon], 16);
+  }
+
+  L.marker([lat, lon])
+    .addTo(harita)
+    .bindPopup("📍 Geçmiş konum")
+    .openPopup();
+
+  setTimeout(function() {
+    harita.invalidateSize();
+  }, 200);
+}
 
   async function hedefAra() {
 
