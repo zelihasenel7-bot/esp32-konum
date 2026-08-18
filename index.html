@@ -104,7 +104,7 @@
   try {
 
     const response = await fetch(
-      "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=" +
+     "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=tr&q=" +
       encodeURIComponent(arama)
     );
 
@@ -116,27 +116,53 @@
       return;
     }
 
-    const hedefLat = parseFloat(data[0].lat);
-    const hedefLon = parseFloat(data[0].lon);
-    const hedefAdi = data[0].display_name;
+    let sonucHTML = "🔎 <b>Bir hedef seç:</b><br><br>";
 
-    document.getElementById("hedefDurum").innerHTML =
-      "🎯 Hedef bulundu:<br>" + hedefAdi;
+data.forEach((yer, index) => {
+  sonucHTML +=
+    "<button onclick='aramaSonucuSec(" + index + ")' " +
+    "style='margin:6px;padding:10px;width:90%;'>" +
+    "📍 " + yer.display_name +
+    "</button><br>";
+});
 
-    const espHedefAdres =
-      "http://172.20.10.2/hedef?hedefLat=" +
-      encodeURIComponent(hedefLat) +
-      "&hedefLon=" +
-      encodeURIComponent(hedefLon);
+document.getElementById("hedefDurum").innerHTML = sonucHTML;
 
-    window.location.href = espHedefAdres;
+window.aramaSonuclari = data;
 
+return;
+    
   } catch (error) {
 
     document.getElementById("hedefDurum").innerHTML =
       "❌ Hedef aranırken hata oluştu.";
 
   }
+}
+
+  function aramaSonucuSec(index) {
+
+  const yer = window.aramaSonuclari[index];
+
+  if (!yer) {
+    alert("Hedef seçilemedi.");
+    return;
+  }
+
+  const hedefLat = parseFloat(yer.lat);
+  const hedefLon = parseFloat(yer.lon);
+  const hedefAdi = yer.display_name;
+
+  document.getElementById("hedefDurum").innerHTML =
+    "🎯 Seçilen hedef:<br>" + hedefAdi;
+
+  const espHedefAdres =
+    "http://172.20.10.2/hedef?hedefLat=" +
+    encodeURIComponent(hedefLat) +
+    "&hedefLon=" +
+    encodeURIComponent(hedefLon);
+
+  window.location.href = espHedefAdres;
 }
 
 function konumAl() {
