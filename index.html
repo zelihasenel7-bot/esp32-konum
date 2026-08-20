@@ -72,6 +72,15 @@
   style="font-size:18px;padding:12px;width:80%;max-width:350px;"
 >
 
+    <br><br>
+
+<input
+  type="text"
+  id="hedefIl"
+  placeholder="Hangi il? Örneğin: Ankara"
+  style="font-size:18px;padding:12px;width:80%;max-width:350px;"
+>
+
 <br><br>
 
 <button onclick="hedefAra()">
@@ -254,9 +263,11 @@ function gecmisiHaritadaGoster(lat, lon) {
   async function hedefAra() {
 
   const arama = document.getElementById("hedefArama").value.trim();
+    const il = document.getElementById("hedefIl").value.trim();
+const sorgu = arama + ", " + il + ", Türkiye";
 
-  if (arama === "") {
-    alert("Lütfen gitmek istediğiniz yeri yazın.");
+  if (arama === "" || il === "") {
+    alert("Lütfen hedefi ve ili yazın.");
     return;
   }
 
@@ -266,8 +277,8 @@ function gecmisiHaritadaGoster(lat, lon) {
   try {
 
     const response = await fetch(
-     "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=tr&q=" +
-      encodeURIComponent(arama)
+     "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=10&countrycodes=tr&q=" +
+      encodeURIComponent(sorgu)
     );
 
     const data = await response.json();
