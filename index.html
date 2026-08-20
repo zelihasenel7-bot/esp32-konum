@@ -601,6 +601,12 @@ if (params.get("hedef") === "ok") {
 
     document.getElementById("hedefSecimAlani").style.display = "none";
 }
+
+  window.addEventListener("pageshow", function() {
+  document.getElementById("hedefSecimAlani").style.display = "none";
+  document.getElementById("hedefBelirleButton").style.display = "inline-block";
+  document.getElementById("ilAdimi").style.display = "none";
+});
 </script>
 
 </body>
