@@ -482,15 +482,6 @@ if (params.get("hedef") === "ok") {
 
     document.getElementById("hedefSecimAlani").style.display = "none";
 }
-
-  const otomatikTakip =
-  new URLSearchParams(window.location.search).get("otomatik");
-
-if (otomatikTakip === "1") {
-  setTimeout(() => {
-    konumAl();
-  }, 1000);
-}
 </script>
 
 </body>
