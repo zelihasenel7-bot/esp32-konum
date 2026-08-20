@@ -400,9 +400,11 @@ document.getElementById("hedefDurum").innerHTML =
 
 document.getElementById("hedefOnay").innerHTML =
   "<br><button onclick='secilenHedefiKaydet()'>" +
-  "✅ Bu hedefi kaydet</button>";
+   "✅ Bu hedefi kaydet</button>";
 
-  function secilenHedefiKaydet() {
+}
+
+function secilenHedefiKaydet() {
   if (secilenHedefUrl === "") {
     alert("Önce bir hedef seçin.");
     return;
