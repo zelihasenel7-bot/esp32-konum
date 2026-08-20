@@ -272,18 +272,24 @@ function gecmisiHaritadaGoster(lat, lon) {
   }, 200);
 }
 
-  function ilAdiminiGoster() {
+function ilAdiminiGoster() {
   const hedef = document.getElementById("hedefArama").value.trim();
+  const ilAdimi = document.getElementById("ilAdimi");
 
   if (hedef === "") {
     alert("Önce gitmek istediğiniz yeri yazın.");
     return;
   }
 
-  document.getElementById("ilAdimi").style.display = "block";
+  if (ilAdimi.style.display === "block") {
+    hedefAra();
+    return;
+  }
+
+  ilAdimi.style.display = "block";
   document.getElementById("hedefIl").focus();
 }
-
+  
   async function hedefAra() {
 
   const arama = document.getElementById("hedefArama").value.trim();
