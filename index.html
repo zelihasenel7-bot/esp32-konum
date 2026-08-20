@@ -107,6 +107,7 @@
 </div>
 
 <div id="harita" style="display:none; height:350px; margin-top:20px;"></div>
+  <div id="hedefOnay"></div>
 
   <hr>
 
@@ -396,10 +397,11 @@ setTimeout(() => {
 }, 200);
 
 document.getElementById("hedefDurum").innerHTML =
-  "🎯 <b>Seçilen Hedef</b><br>📍 " + kisaAdres +
-  "<br><br><button onclick='secilenHedefiKaydet()'>" +
+  "🎯 <b>Seçilen Hedef</b><br>📍 " + kisaAdres;
+
+document.getElementById("hedefOnay").innerHTML =
+  "<br><button onclick='secilenHedefiKaydet()'>" +
   "✅ Bu hedefi kaydet</button>";
-}
 
   function secilenHedefiKaydet() {
   if (secilenHedefUrl === "") {
