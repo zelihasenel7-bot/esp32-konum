@@ -292,6 +292,8 @@ function ilAdiminiGoster() {
   
   async function hedefAra() {
 
+    document.getElementById("harita").style.display = "none";
+
   const arama = document.getElementById("hedefArama").value.trim();
     const il = document.getElementById("hedefIl").value.trim();
 const sorgu = arama + ", " + il + ", Türkiye";
