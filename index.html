@@ -375,7 +375,39 @@ document.getElementById("hedefDurum").innerHTML =
 "&hedefAdres=" +
 encodeURIComponent(kisaAdres);
 
-  window.location.href = espHedefAdres;
+  secilenHedefUrl = espHedefAdres;
+
+hedefSec();
+harita.off("click");
+
+harita.setView([hedefLat, hedefLon], 16);
+
+if (hedefMarker) {
+  harita.removeLayer(hedefMarker);
+}
+
+hedefMarker = L.marker([hedefLat, hedefLon])
+  .addTo(harita)
+  .bindPopup(kisaAdres)
+  .openPopup();
+
+setTimeout(() => {
+  harita.invalidateSize();
+}, 200);
+
+document.getElementById("hedefDurum").innerHTML =
+  "🎯 <b>Seçilen Hedef</b><br>📍 " + kisaAdres +
+  "<br><br><button onclick='secilenHedefiKaydet()'>" +
+  "✅ Bu hedefi kaydet</button>";
+}
+
+  function secilenHedefiKaydet() {
+  if (secilenHedefUrl === "") {
+    alert("Önce bir hedef seçin.");
+    return;
+  }
+
+  window.location.href = secilenHedefUrl;
 }
 
 function konumAl() {
@@ -438,6 +470,7 @@ encodeURIComponent(saat);
 
   let harita;
 let hedefMarker;
+  let secilenHedefUrl = "";
 
 function hedefSec() {
 
@@ -489,7 +522,30 @@ const espHedefAdres =
   "&hedefLon=" +
   encodeURIComponent(hedefLon);
 
-window.location.href = espHedefAdres;
+secilenHedefUrl = espHedefAdres;
+
+hedefSec();
+harita.off("click");
+
+harita.setView([hedefLat, hedefLon], 16);
+
+if (hedefMarker) {
+  harita.removeLayer(hedefMarker);
+}
+
+hedefMarker = L.marker([hedefLat, hedefLon])
+  .addTo(harita)
+  .bindPopup(kisaAdres)
+  .openPopup();
+
+setTimeout(() => {
+  harita.invalidateSize();
+}, 200);
+
+document.getElementById("hedefDurum").innerHTML =
+  "🎯 <b>Seçilen Hedef</b><br>📍 " + kisaAdres +
+  "<br><br><button onclick='secilenHedefiKaydet()'>" +
+  "✅ Bu hedefi kaydet</button>";
       
       if (hedefMarker) {
         harita.removeLayer(hedefMarker);
