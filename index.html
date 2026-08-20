@@ -133,7 +133,15 @@
 
 <br><br>
 
-<div id="guvenliBolgeAlani" style="display:none;">
+<div id="guvenliBolgeAlani" style="display:none;position:relative;">
+
+  <button
+  type="button"
+  onclick="guvenliBolgeAlaniniKapat()"
+  style="position:absolute;right:5px;top:0;width:auto;min-width:0;padding:5px 10px;background:none;border:none;color:#555;font-size:24px;"
+>
+  ✕
+</button>
 
 <h2>🛡️ Güvenli Bölge Ayarı</h2>
 
@@ -296,6 +304,12 @@ function gecmisiHaritadaGoster(lat, lon) {
 }
 
   function guvenliBolgeAlaniniAc() {
+
+    function guvenliBolgeAlaniniKapat() {
+  document.getElementById("guvenliBolgeAlani").style.display = "none";
+  document.getElementById("guvenliBolgeButton").style.display = "inline-block";
+}
+    
   document.getElementById("guvenliBolgeAlani").style.display = "block";
   document.getElementById("guvenliBolgeButton").style.display = "none";
 }
