@@ -73,7 +73,14 @@
 
 <br><br>
 
-  <div id="hedefSecimAlani" style="display:none;">
+  <div id="hedefSecimAlani" style="display:none;position:relative;">
+
+<span
+  onclick="hedefAlaniniKapat()"
+  style="position:absolute;right:15px;top:-55px;font-size:20px;color:#777;cursor:pointer;padding:8px;"
+>
+  ✕
+</span>
 
 <input
   type="text"
@@ -316,6 +323,15 @@ function guvenliBolgeAlaniniKapat() {
   document.getElementById("hedefSecimAlani").style.display = "block";
   document.getElementById("hedefBelirleButton").style.display = "none";
   document.getElementById("hedefArama").focus();
+}
+
+  function hedefAlaniniKapat() {
+  document.getElementById("hedefSecimAlani").style.display = "none";
+  document.getElementById("hedefBelirleButton").style.display = "inline-block";
+  document.getElementById("ilAdimi").style.display = "none";
+  document.getElementById("harita").style.display = "none";
+  document.getElementById("hedefDurum").innerHTML = "";
+  document.getElementById("hedefOnay").innerHTML = "";
 }
 
 function ilAdiminiGoster() {
