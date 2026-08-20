@@ -123,6 +123,18 @@
 
   <hr>
 
+  <button
+  type="button"
+  id="guvenliBolgeButton"
+  onclick="guvenliBolgeAlaniniAc()"
+>
+  🛡️ Güvenli Bölgeyi Ayarla
+</button>
+
+<br><br>
+
+<div id="guvenliBolgeAlani" style="display:none;">
+
 <h2>🛡️ Güvenli Bölge Ayarı</h2>
 
 <select id="guvenliBolgeSec"
@@ -140,6 +152,7 @@ style="font-size:18px;padding:10px;width:80%;max-width:300px;">
 </button>
 
 <p id="guvenliBolgeMesaj"></p>
+  </div>
 
 <hr>
 
@@ -280,6 +293,11 @@ function gecmisiHaritadaGoster(lat, lon) {
   setTimeout(function() {
     harita.invalidateSize();
   }, 200);
+}
+
+  function guvenliBolgeAlaniniAc() {
+  document.getElementById("guvenliBolgeAlani").style.display = "block";
+  document.getElementById("guvenliBolgeButton").style.display = "none";
 }
 
   function hedefAlaniniAc() {
@@ -606,6 +624,9 @@ if (params.get("hedef") === "ok") {
   document.getElementById("hedefSecimAlani").style.display = "none";
   document.getElementById("hedefBelirleButton").style.display = "inline-block";
   document.getElementById("ilAdimi").style.display = "none";
+
+    document.getElementById("guvenliBolgeAlani").style.display = "none";
+document.getElementById("guvenliBolgeButton").style.display = "inline-block";
 });
 </script>
 
