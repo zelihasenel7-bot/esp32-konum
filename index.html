@@ -63,7 +63,17 @@
 
   <br><br>
 
-  <div id="hedefSecimAlani">
+  <button
+  type="button"
+  id="hedefBelirleButton"
+  onclick="hedefAlaniniAc()"
+>
+  🎯 Hedef Belirle
+</button>
+
+<br><br>
+
+  <div id="hedefSecimAlani" style="display:none;">
 
 <input
   type="text"
@@ -270,6 +280,12 @@ function gecmisiHaritadaGoster(lat, lon) {
   setTimeout(function() {
     harita.invalidateSize();
   }, 200);
+}
+
+  function hedefAlaniniAc() {
+  document.getElementById("hedefSecimAlani").style.display = "block";
+  document.getElementById("hedefBelirleButton").style.display = "none";
+  document.getElementById("hedefArama").focus();
 }
 
 function ilAdiminiGoster() {
