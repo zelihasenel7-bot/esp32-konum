@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
 
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+        content="width=device-width,initial-scale=1.0">
 
   <title>ESP32 Konum</title>
 
@@ -167,7 +167,7 @@ style="font-size:18px;padding:10px;width:80%;max-width:300px;">
   🕘 Konum Geçmişi
 </button>
 
-<div id="konumGecmisi">
+<div id="konumGecmisi" style="display:none;">
   <p>Henüz konum geçmişi gösterilmedi.</p>
 </div>
 
@@ -204,6 +204,8 @@ style="font-size:18px;padding:10px;width:80%;max-width:300px;">
 }
 
   async function konumGecmisiniGetir() {
+
+    document.getElementById("konumGecmisi").style.display = "block"; 
 
   const alan = document.getElementById("konumGecmisi");
 
