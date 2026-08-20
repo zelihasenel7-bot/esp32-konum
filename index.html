@@ -65,27 +65,37 @@
 
   <div id="hedefSecimAlani">
 
-  <input
+<input
   type="text"
   id="hedefArama"
   placeholder="Gitmek istediğiniz yeri yazın"
   style="font-size:18px;padding:12px;width:80%;max-width:350px;"
 >
 
-    <br><br>
-
-<input
-  type="text"
-  id="hedefIl"
-  placeholder="Hangi il? Örneğin: Ankara"
-  style="font-size:18px;padding:12px;width:80%;max-width:350px;"
->
-
 <br><br>
 
-<button onclick="hedefAra()">
-  🔎 Hedefi Ara
+<button type="button" onclick="ilAdiminiGoster()">
+  Devam
 </button>
+
+<div id="ilAdimi" style="display:none;">
+
+  <br><br>
+
+  <input
+    type="text"
+    id="hedefIl"
+    placeholder="Hangi il? Örneğin: Ankara"
+    style="font-size:18px;padding:12px;width:80%;max-width:350px;"
+  >
+
+  <br><br>
+
+  <button type="button" onclick="hedefAra()">
+    🔎 Hedefi Ara
+  </button>
+
+</div>
 
 <br><br>
 
@@ -258,6 +268,18 @@ function gecmisiHaritadaGoster(lat, lon) {
   setTimeout(function() {
     harita.invalidateSize();
   }, 200);
+}
+
+  function ilAdiminiGoster() {
+  const hedef = document.getElementById("hedefArama").value.trim();
+
+  if (hedef === "") {
+    alert("Önce gitmek istediğiniz yeri yazın.");
+    return;
+  }
+
+  document.getElementById("ilAdimi").style.display = "block";
+  document.getElementById("hedefIl").focus();
 }
 
   async function hedefAra() {
