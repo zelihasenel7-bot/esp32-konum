@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
   <style>
 
@@ -43,6 +44,32 @@
       font-size: 18px;
     }
 
+    .mqtt-kart {
+      margin: 20px 0;
+      padding: 16px;
+      text-align: left;
+      background: #f7f9fb;
+      border: 1px solid #dfe5ea;
+      border-radius: 14px;
+      line-height: 1.7;
+    }
+
+    #mqttBaglanti {
+      font-weight: bold;
+      color: #b26a00;
+    }
+
+    #mqttUyari {
+      display: none;
+      margin-top: 12px;
+      padding: 10px;
+      color: white;
+      background: #d93025;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
   </style>
 </head>
 
@@ -56,6 +83,16 @@
   <p id="durum">
     Konum alınmaya hazır.
   </p>
+
+  <div class="mqtt-kart">
+    <div id="mqttBaglanti">🟡 MQTT bağlantısı kuruluyor...</div>
+    <div>📍 Enlem: <b id="mqttEnlem">-</b></div>
+    <div>📍 Boylam: <b id="mqttBoylam">-</b></div>
+    <div>📏 Güvenli merkeze uzaklık: <b id="mqttMesafe">-</b></div>
+    <div>🛡️ Güvenli bölge: <b id="mqttDurum">-</b></div>
+    <div>🕐 Son güncelleme: <b id="mqttSaat">-</b></div>
+    <div id="mqttUyari">⚠️ GÜVENLİ BÖLGE DIŞINA ÇIKILDI!</div>
+  </div>
 
   <button onclick="konumAl()">
     📍 Konumumu Gönder
@@ -181,6 +218,61 @@ style="font-size:18px;padding:10px;width:80%;max-width:300px;">
 
 
 <script>
+
+const mqttTopic = "zelis/gps/test/210826";
+const mqttClientId = "web-gps-" + Math.random().toString(16).slice(2, 10);
+const mqttBaglantisi = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
+  clientId: mqttClientId,
+  clean: true,
+  connectTimeout: 10000,
+  reconnectPeriod: 3000
+});
+
+mqttBaglantisi.on("connect", function() {
+  document.getElementById("mqttBaglanti").textContent =
+    "🟢 MQTT bağlantısı aktif";
+  document.getElementById("mqttBaglanti").style.color = "#188038";
+
+  mqttBaglantisi.subscribe(mqttTopic);
+});
+
+mqttBaglantisi.on("reconnect", function() {
+  document.getElementById("mqttBaglanti").textContent =
+    "🟡 MQTT yeniden bağlanıyor...";
+  document.getElementById("mqttBaglanti").style.color = "#b26a00";
+});
+
+mqttBaglantisi.on("error", function() {
+  document.getElementById("mqttBaglanti").textContent =
+    "🔴 MQTT bağlantısı kurulamadı";
+  document.getElementById("mqttBaglanti").style.color = "#d93025";
+});
+
+mqttBaglantisi.on("message", function(topic, gelenMesaj) {
+  if (topic !== mqttTopic) return;
+
+  try {
+    const veri = JSON.parse(gelenMesaj.toString());
+
+    document.getElementById("mqttEnlem").textContent = veri.enlem ?? "-";
+    document.getElementById("mqttBoylam").textContent = veri.boylam ?? "-";
+    document.getElementById("mqttMesafe").textContent =
+      veri.mesafe !== undefined ? veri.mesafe + " metre" : "-";
+    document.getElementById("mqttDurum").textContent =
+      veri.durum === "guvenli_bolge_icinde"
+        ? "İçinde ✅"
+        : veri.durum === "guvenli_bolge_disi"
+          ? "Dışında ❌"
+          : veri.durum ?? "-";
+    document.getElementById("mqttSaat").textContent =
+      new Date().toLocaleTimeString("tr-TR");
+
+    const uyari = document.getElementById("mqttUyari");
+    uyari.style.display = veri.yeni_uyari === true ? "block" : "none";
+  } catch (error) {
+    console.error("MQTT mesajı okunamadı:", error);
+  }
+});
 
   async function guvenliBolgeKaydet() {
 
@@ -661,5 +753,3 @@ document.getElementById("guvenliBolgeButton").style.display = "inline-block";
 });
 </script>
 
-</body>
-</html>
