@@ -644,17 +644,35 @@ const saat = simdi.toLocaleTimeString("tr-TR");
       document.getElementById("durum").innerHTML =
         "✅ Konum bulundu! ESP32'ye gönderiliyor...";
 
-      const adres =
-        "http://172.20.10.2/konum?lat=" +
-        encodeURIComponent(lat) +
-        "&lon=" +
-        encodeURIComponent(lon) +
-        "&acc=" +
-encodeURIComponent(acc) +
-"&saat=" +
-encodeURIComponent(saat);
+  const telefonKonumTopic =
+  "zelis/gps/komut/210826/telefon-konumu";
 
-      window.location.href = adres;
+const konumMesaji = JSON.stringify({
+  enlem: lat,
+  boylam: lon,
+  dogruluk: acc,
+  saat: saat,
+  kaynak: "telefon"
+});
+
+if (mqttBaglantisi.connected) {
+  mqttBaglantisi.publish(
+    telefonKonumTopic,
+    konumMesaji,
+    function(error) {
+      if (error) {
+        document.getElementById("durum").innerHTML =
+          "❌ Konum MQTT ile gönderilemedi.";
+      } else {
+        document.getElementById("durum").innerHTML =
+          "✅ Konum MQTT ile gönderildi.";
+      }
+    }
+  );
+} else {
+  document.getElementById("durum").innerHTML =
+    "❌ MQTT bağlantısı aktif değil.";
+}
     },
 
 
