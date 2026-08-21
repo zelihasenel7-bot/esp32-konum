@@ -91,7 +91,15 @@
     <div>📏 Güvenli merkeze uzaklık: <b id="mqttMesafe">-</b></div>
     <div>🛡️ Güvenli bölge: <b id="mqttDurum">-</b></div>
     <div>🕐 Son güncelleme: <b id="mqttSaat">-</b></div>
-    <div id="mqttUyari">⚠️ GÜVENLİ BÖLGE DIŞINA ÇIKILDI!</div>
+   <div id="mqttUyari">
+  ⚠️ GÜVENLİ BÖLGE DIŞINA ÇIKILDI!
+  <span
+    onclick="document.getElementById('mqttUyari').style.display='none'"
+    style="float:right;cursor:pointer;font-size:22px;"
+  >
+    ×
+  </span>
+</div>
   </div>
 
   <button onclick="konumAl()">
@@ -268,7 +276,13 @@ mqttBaglantisi.on("message", function(topic, gelenMesaj) {
       new Date().toLocaleTimeString("tr-TR");
 
     const uyari = document.getElementById("mqttUyari");
-    uyari.style.display = veri.yeni_uyari === true ? "block" : "none";
+    if (veri.yeni_uyari === true) {
+  uyari.style.display = "block";
+}
+
+if (veri.durum === "guvenli_bolge_icinde") {
+  uyari.style.display = "none";
+}
   } catch (error) {
     console.error("MQTT mesajı okunamadı:", error);
   }
