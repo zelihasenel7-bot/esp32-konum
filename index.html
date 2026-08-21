@@ -91,6 +91,16 @@
     <div>📏 Güvenli merkeze uzaklık: <b id="mqttMesafe">-</b></div>
     <div>🛡️ Güvenli bölge: <b id="mqttDurum">-</b></div>
     <div>🕐 Son güncelleme: <b id="mqttSaat">-</b></div>
+
+    <button
+  type="button"
+  id="mqttHaritaButton"
+  onclick="mqttKonumuHaritadaGoster()"
+  disabled
+  style="margin-top:12px;padding:10px 15px;font-size:16px;"
+>
+  🗺️ Haritada Göster
+</button>
    <div id="mqttUyari">
   ⚠️ GÜVENLİ BÖLGE DIŞINA ÇIKILDI!
   <span
@@ -227,6 +237,9 @@ style="font-size:18px;padding:10px;width:80%;max-width:300px;">
 
 <script>
 
+  let sonMqttEnlem = null;
+let sonMqttBoylam = null;
+
 const mqttTopic = "zelis/gps/test/210826";
 const mqttClientId = "web-gps-" + Math.random().toString(16).slice(2, 10);
 const mqttBaglantisi = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
@@ -262,6 +275,11 @@ mqttBaglantisi.on("message", function(topic, gelenMesaj) {
   try {
     const veri = JSON.parse(gelenMesaj.toString());
 
+    sonMqttEnlem = Number(veri.enlem);
+sonMqttBoylam = Number(veri.boylam);
+
+document.getElementById("mqttHaritaButton").disabled = false;
+
     document.getElementById("mqttEnlem").textContent = veri.enlem ?? "-";
     document.getElementById("mqttBoylam").textContent = veri.boylam ?? "-";
     document.getElementById("mqttMesafe").textContent =
@@ -287,6 +305,21 @@ if (veri.durum === "guvenli_bolge_icinde") {
     console.error("MQTT mesajı okunamadı:", error);
   }
 });
+
+  function mqttKonumuHaritadaGoster() {
+  if (sonMqttEnlem === null || sonMqttBoylam === null) {
+    alert("Henüz MQTT konumu alınmadı.");
+    return;
+  }
+
+  const haritaAdresi =
+    "https://www.google.com/maps?q=" +
+    sonMqttEnlem +
+    "," +
+    sonMqttBoylam;
+
+  window.open(haritaAdresi, "_blank");
+}
 
   async function guvenliBolgeKaydet() {
 
