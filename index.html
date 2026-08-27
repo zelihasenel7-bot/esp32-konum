@@ -309,7 +309,7 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
 
 const mqttTopic = "zelis/gps/test/210826";
 const mqttClientId = "web-gps-" + Math.random().toString(16).slice(2, 10);
-const mqttBaglantisi = mqtt.connect("wss://broker.hivemq.com:8884/mqtt", {
+const mqttBaglantisi = mqtt.connect("wss://test.mosquitto.org:8081/mqtt", {
   clientId: mqttClientId,
   clean: true,
   connectTimeout: 10000,
