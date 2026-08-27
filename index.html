@@ -249,8 +249,7 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
 <input
   type="number"
   id="guvenliBolgeSec"
-  min="1"
-  max="1000"
+  min="20"
   step="1"
   value="20"
   placeholder="Metre girin"
@@ -426,11 +425,10 @@ if (veri.durum === "guvenli_bolge_icinde") {
 
 if (
   !Number.isInteger(metreSayisi) ||
-  metreSayisi < 1 ||
-  metreSayisi > 1000
+metreSayisi < 20
 ) {
   mesaj.innerHTML =
-    "❌ 1 ile 1000 arasında tam sayı girin.";
+  "❌ En az 20 metre olacak şekilde tam sayı girin.";
   return;
 }
 
