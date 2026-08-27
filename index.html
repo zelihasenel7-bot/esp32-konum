@@ -242,14 +242,25 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
   
 <h2 style="margin-top:0;">🛡️ Güvenli Bölge Ayarı</h2>
 
-<select id="guvenliBolgeSec"
-style="font-size:18px;padding:10px;width:80%;max-width:300px;">
-  <option value="10">10 metre</option>
-  <option value="20">20 metre</option>
-  <option value="50">50 metre</option>
-  <option value="100">100 metre</option>
-</select>
-
+<input
+  type="number"
+  id="guvenliBolgeSec"
+  min="1"
+  max="1000"
+  step="1"
+  value="20"
+  placeholder="Metre girin"
+  inputmode="numeric"
+  style="
+    width: 130px;
+    padding: 12px;
+    font-size: 17px;
+    text-align: center;
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+  "
+>
+<span style="font-size:17px;">metre</span>
 <br><br>
 
 <button onclick="guvenliBolgeKaydet()">
