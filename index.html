@@ -13,53 +13,104 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-  <style>
 
-  @media (max-width: 600px) {
+  <style>
   body {
-    padding: 12px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f3f3f3;
+    padding: 40px;
     margin: 0;
   }
 
   .kart {
-    width: auto;
-    max-width: 100%;
-    padding: 18px;
-  }
-
-  h1 {
-    font-size: 30px;
-  }
-
-  #durum {
-    margin: 16px 0;
-    font-size: 17px;
-  }
-
-  .mqtt-kart {
-    padding: 14px;
-    font-size: 16px;
-    line-height: 1.6;
-  }
-
-  .mqtt-kart button {
-    font-size: 15px !important;
-    padding: 10px 12px !important;
-  }
-
-  #mqttUyari {
-    font-size: 16px;
-    padding: 12px;
+    background: white;
+    max-width: 400px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 18px;
   }
 
   button {
-    max-width: 100%;
-    font-size: 17px;
-    padding: 14px 18px;
+    padding: 16px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
   }
-}
 
-  <style>
+  #durum {
+    margin: 25px 0;
+    font-size: 18px;
+  }
+
+  .mqtt-kart {
+    margin: 20px 0;
+    padding: 16px;
+    text-align: left;
+    background: #f7f9fb;
+    border: 1px solid #dfe5ea;
+    border-radius: 14px;
+    line-height: 1.7;
+  }
+
+  #mqttBaglanti {
+    font-weight: bold;
+    color: #b26a00;
+  }
+
+  #mqttUyari {
+    display: none;
+    margin-top: 12px;
+    padding: 12px;
+    color: white;
+    background: #d93025;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  @media (max-width: 600px) {
+    body {
+      padding: 12px;
+    }
+
+    .kart {
+      max-width: 100%;
+      padding: 18px;
+    }
+
+    h1 {
+      font-size: 30px;
+    }
+
+    #durum {
+      margin: 16px 0;
+      font-size: 17px;
+    }
+
+    .mqtt-kart {
+      padding: 14px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .mqtt-kart button {
+      font-size: 15px !important;
+      padding: 10px 12px !important;
+    }
+
+    #mqttUyari {
+      font-size: 16px;
+    }
+
+    button {
+      max-width: 100%;
+      font-size: 17px;
+      padding: 14px 18px;
+    }
+  }
+</style>
 
     body {
       font-family: Arial;
