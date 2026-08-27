@@ -329,6 +329,8 @@ mqttBaglantisi.on("message", function(topic, gelenMesaj) {
 
   try {
     const veri = JSON.parse(gelenMesaj.toString());
+    
+    mqttKonumunuGecmiseEkle(veri);
 
     sonMqttMesajZamani = Date.now();
 
@@ -450,75 +452,77 @@ if (veri.durum === "guvenli_bolge_icinde") {
   );
 }
 
-  async function konumGecmisiniGetir() {
+function mqttKonumunuGecmiseEkle(veri) {
+  const enlem = Number(veri.enlem);
+  const boylam = Number(veri.boylam);
 
-
-    window.location.href = "http://172.20.10.2/gecmis-sayfa";
-return;
-
-    document.getElementById("konumGecmisi").style.display = "block"; 
-
-  const alan = document.getElementById("konumGecmisi");
-
-  alan.innerHTML = "⏳ Konum geçmişi yükleniyor...";
-
-  try {
-
-    const response = await fetch("http://172.20.10.2/gecmis");
-
-    const gecmis = await response.json();
-
-    if (gecmis.length === 0) {
-      alan.innerHTML = "📭 Henüz kayıtlı konum yok.";
-      return;
-    }
-
-    let html = "";
-
-    for (let i = gecmis.length - 1; i >= 0; i--) {
-
-      const kayit = gecmis[i];
-
-      let adres = "Konum";
-
-      try {
-
-        const adresResponse = await fetch(
-          "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" +
-          encodeURIComponent(kayit.lat) +
-          "&lon=" +
-          encodeURIComponent(kayit.lon)
-        );
-
-        const adresData = await adresResponse.json();
-
-        if (adresData && adresData.display_name) {
-          adres = adresData.display_name;
-        }
-
-      } catch (e) {
-        adres = "Adres alınamadı";
-      }
-
-      html +=
-        "<div style='margin:15px 0;padding:12px;border:1px solid #ccc;border-radius:10px;'>" +
-        "🕐 <b>" + kayit.saat + "</b><br>" +
-        "📍 " + adres + "<br><br>" +
-        "<button onclick='gecmisiHaritadaGoster(" +
-        kayit.lat + "," + kayit.lon +
-        ")'>🗺️ Haritada Göster</button>" +
-        "</div>";
-    }
-
-    alan.innerHTML = html;
-
-  } catch (error) {
-
-    alan.innerHTML =
-      "❌ Konum geçmişi ESP32'den alınamadı.";
+  if (
+    !Number.isFinite(enlem) ||
+    !Number.isFinite(boylam)
+  ) {
+    return;
   }
+
+  let gecmis = JSON.parse(
+    localStorage.getItem("mqttKonumGecmisi") ||
+    "[]"
+  );
+
+  gecmis.push({
+    enlem: enlem,
+    boylam: boylam,
+    saat: new Date().toLocaleString("tr-TR")
+  });
+
+  gecmis = gecmis.slice(-10);
+
+  localStorage.setItem(
+    "mqttKonumGecmisi",
+    JSON.stringify(gecmis)
+  );
 }
 
+function konumGecmisiniGetir() {
+  const alan =
+    document.getElementById("konumGecmisi");
+
+  alan.style.display = "block";
+
+  const gecmis = JSON.parse(
+    localStorage.getItem("mqttKonumGecmisi") ||
+    "[]"
+  );
+
+  if (gecmis.length === 0) {
+    alan.innerHTML =
+      "📭 Henüz kayıtlı konum yok.";
+    return;
+  }
+
+  let html = "";
+
+  for (let i = gecmis.length - 1; i >= 0; i--) {
+    const kayit = gecmis[i];
+
+    html +=
+      "<div style='" +
+      "margin:12px 0;padding:12px;" +
+      "border:1px solid #ccc;" +
+      "border-radius:10px;'>" +
+      "🕐 <b>" + kayit.saat + "</b><br>" +
+      "📍 " +
+      kayit.enlem.toFixed(6) + ", " +
+      kayit.boylam.toFixed(6) +
+      "<br><br>" +
+      "<button onclick='gecmisiHaritadaGoster(" +
+      kayit.enlem + "," +
+      kayit.boylam +
+      ")'>🗺️ Haritada Göster</button>" +
+      "</div>";
+  }
+
+  alan.innerHTML = html;
+} 
 
 function gecmisiHaritadaGoster(lat, lon) {
 
