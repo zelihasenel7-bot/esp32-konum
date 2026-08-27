@@ -422,6 +422,18 @@ if (veri.durum === "guvenli_bolge_icinde") {
   const mesaj =
     document.getElementById("guvenliBolgeMesaj");
 
+    const metreSayisi = Number(metre);
+
+if (
+  !Number.isInteger(metreSayisi) ||
+  metreSayisi < 1 ||
+  metreSayisi > 1000
+) {
+  mesaj.innerHTML =
+    "❌ 1 ile 1000 arasında tam sayı girin.";
+  return;
+}
+
   const guvenliBolgeTopic =
     "zelis/gps/komut/210826/guvenli-bolge";
 
@@ -432,7 +444,7 @@ if (veri.durum === "guvenli_bolge_icinde") {
   }
 
   const ayarMesaji = JSON.stringify({
-    metre: Number(metre)
+    metre: metreSayisi
   });
 
   mqttBaglantisi.publish(
