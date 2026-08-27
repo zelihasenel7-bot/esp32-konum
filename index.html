@@ -525,38 +525,15 @@ function konumGecmisiniGetir() {
 } 
 
 function gecmisiHaritadaGoster(lat, lon) {
+  const haritaAdresi =
+    "https://www.google.com/maps?q=" +
+    lat +
+    "," +
+    lon;
 
-  const haritaDiv = document.getElementById("harita");
-
-  haritaDiv.style.display = "block";
-
-  if (!harita) {
-
-    harita = L.map("harita").setView([lat, lon], 16);
-
-    L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        maxZoom: 19,
-        attribution: "© OpenStreetMap"
-      }
-    ).addTo(harita);
-
-  } else {
-
-    harita.setView([lat, lon], 16);
-  }
-
-  L.marker([lat, lon])
-    .addTo(harita)
-    .bindPopup("📍 Geçmiş konum")
-    .openPopup();
-
-  setTimeout(function() {
-    harita.invalidateSize();
-  }, 200);
+  window.open(haritaAdresi, "_blank");
 }
-
+  
   function guvenliBolgeAlaniniAc() {
   document.getElementById("guvenliBolgeAlani").style.display = "block";
   document.getElementById("guvenliBolgeButton").style.display = "none";
