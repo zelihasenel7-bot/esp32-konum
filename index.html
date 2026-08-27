@@ -658,15 +658,9 @@ localStorage.setItem("secilenHedefAdres", kisaAdres);
 document.getElementById("hedefDurum").innerHTML =
     "🎯 <b>Seçilen Hedef</b><br>📍 " + kisaAdres;
 
-  const espHedefAdres =
-    "http://172.20.10.2/hedef?hedefLat=" +
-    encodeURIComponent(hedefLat) +
-    "&hedefLon=" +
-    encodeURIComponent(hedefLon) +
-"&hedefAdres=" +
-encodeURIComponent(kisaAdres);
-
-  secilenHedefUrl = espHedefAdres;
+secilenHedefLat = hedefLat;
+secilenHedefLon = hedefLon;
+secilenHedefAdres = kisaAdres; 
 
 hedefSec();
 
@@ -695,12 +689,42 @@ document.getElementById("hedefOnay").innerHTML =
 }
 
 function secilenHedefiKaydet() {
-  if (secilenHedefUrl === "") {
+  if (
+    secilenHedefLat === null ||
+    secilenHedefLon === null
+  ) {
     alert("Önce bir hedef seçin.");
     return;
   }
 
-  window.location.href = secilenHedefUrl;
+  if (!mqttBaglantisi.connected) {
+    alert("MQTT bağlantısı aktif değil.");
+    return;
+  }
+
+  const hedefTopic =
+    "zelis/gps/komut/210826/hedef";
+
+  const hedefMesaji = JSON.stringify({
+    enlem: secilenHedefLat,
+    boylam: secilenHedefLon,
+    adres: secilenHedefAdres
+  });
+
+  mqttBaglantisi.publish(
+    hedefTopic,
+    hedefMesaji,
+    function(error) {
+      if (error) {
+        alert("Hedef gönderilemedi.");
+      } else {
+        document.getElementById("hedefDurum").innerHTML =
+          "✅ Hedef MQTT ile gönderildi!<br><br>" +
+          "🎯 <b>Seçilen Hedef</b><br>" +
+          "📍 " + secilenHedefAdres;
+      }
+    }
+  );
 }
 
 function konumAl() {
@@ -781,7 +805,9 @@ if (mqttBaglantisi.connected) {
 
   let harita;
 let hedefMarker;
-  let secilenHedefUrl = "";
+let secilenHedefLat = null;
+let secilenHedefLon = null;
+let secilenHedefAdres = "";
 
 function hedefSec() {
 
