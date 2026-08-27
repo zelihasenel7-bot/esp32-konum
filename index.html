@@ -129,6 +129,10 @@
     <div>📍 Boylam: <b id="mqttBoylam">-</b></div>
     <div>📏 Güvenli merkeze uzaklık: <b id="mqttMesafe">-</b></div>
     <div>
+  ⭕ Güvenli bölge yarıçapı:
+  <b id="mqttYaricap">-</b>
+</div>
+    <div>
   🎯 Hedefe kalan:
   <b id="mqttHedefMesafe">Henüz hedef seçilmedi</b>
 </div>
@@ -348,6 +352,10 @@ document.getElementById("mqttHaritaButton").disabled = false;
     document.getElementById("mqttBoylam").textContent = veri.boylam ?? "-";
     document.getElementById("mqttMesafe").textContent =
       veri.mesafe !== undefined ? veri.mesafe + " metre" : "-";
+    document.getElementById("mqttYaricap").textContent =
+  veri.guvenli_yaricap !== undefined
+    ? veri.guvenli_yaricap + " metre"
+    : "-";
     const hedefMesafeAlani =
   document.getElementById("mqttHedefMesafe");
 
