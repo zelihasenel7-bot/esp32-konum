@@ -356,6 +356,13 @@ document.getElementById("mqttHaritaButton").disabled = false;
   veri.guvenli_yaricap !== undefined
     ? veri.guvenli_yaricap + " metre"
     : "-";
+
+    if (veri.guvenli_yaricap !== undefined) {
+  document.getElementById(
+    "guvenliBolgeSec"
+  ).value = veri.guvenli_yaricap;
+}
+    
     const hedefMesafeAlani =
   document.getElementById("mqttHedefMesafe");
 
