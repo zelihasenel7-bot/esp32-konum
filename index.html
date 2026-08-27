@@ -826,90 +826,84 @@ let secilenHedefLon = null;
 let secilenHedefAdres = "";
 
 function hedefSec() {
+  const haritaDiv =
+    document.getElementById("harita");
 
-  const haritaDiv = document.getElementById("harita");
   haritaDiv.style.display = "block";
 
   if (!harita) {
+    harita = L.map("harita")
+      .setView([39.93, 32.85], 12);
 
-    harita = L.map("harita").setView([39.93, 32.85], 12);
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap"
+      }
+    ).addTo(harita);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution: "© OpenStreetMap"
-    }).addTo(harita);
-
-    harita.on("click", function(e) {
-
+    harita.on("click", async function(e) {
       const hedefLat = e.latlng.lat;
       const hedefLon = e.latlng.lng;
 
+      let kisaAdres =
+        "Haritadan seçilen konum";
 
-      let hedefAdi = "Seçilen konum";
+      try {
+        const response = await fetch(
+          "https://nominatim.openstreetmap.org/reverse" +
+          "?format=jsonv2&lat=" +
+          encodeURIComponent(hedefLat) +
+          "&lon=" +
+          encodeURIComponent(hedefLon)
+        );
 
-fetch(
-  "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" +
-  encodeURIComponent(hedefLat) +
-  "&lon=" +
-  encodeURIComponent(hedefLon)
-)
-.then(response => response.json())
-.then(data => {
+        const data = await response.json();
 
-  if (data && data.display_name) {
-    hedefAdi = data.display_name;
-  }
+        if (data && data.display_name) {
+          kisaAdres = data.display_name
+            .split(",")
+            .slice(0, 3)
+            .join(",");
+        }
+      } catch (error) {
+        console.log("Adres alınamadı.");
+      }
 
-  document.getElementById("hedefDurum").innerHTML =
-    "🎯 Hedef: " + hedefAdi;
+      secilenHedefLat = hedefLat;
+      secilenHedefLon = hedefLon;
+      secilenHedefAdres = kisaAdres;
 
-})
-.catch(() => {
-  document.getElementById("hedefDurum").innerHTML =
-    "📍 Hedef seçildi";
-});
+      localStorage.setItem(
+        "secilenHedefAdres",
+        kisaAdres
+      );
 
-const espHedefAdres =
-  "http://172.20.10.2/hedef?hedefLat=" +
-  encodeURIComponent(hedefLat) +
-  "&hedefLon=" +
-  encodeURIComponent(hedefLon);
-
-secilenHedefUrl = espHedefAdres;
-
-hedefSec();
-harita.off("click");
-
-harita.setView([hedefLat, hedefLon], 16);
-
-if (hedefMarker) {
-  harita.removeLayer(hedefMarker);
-}
-
-hedefMarker = L.marker([hedefLat, hedefLon])
-  .addTo(harita)
-  .bindPopup(kisaAdres)
-  .openPopup();
-
-setTimeout(() => {
-  harita.invalidateSize();
-}, 200);
-
-document.getElementById("hedefDurum").innerHTML =
-  "🎯 <b>Seçilen Hedef</b><br>📍 " + kisaAdres +
-  "<br><br><button onclick='secilenHedefiKaydet()'>" +
-  "✅ Bu hedefi kaydet</button>";
-      
       if (hedefMarker) {
         harita.removeLayer(hedefMarker);
       }
 
-      hedefMarker = L.marker([hedefLat, hedefLon]).addTo(harita);
+      hedefMarker = L.marker([
+        hedefLat,
+        hedefLon
+      ])
+        .addTo(harita)
+        .bindPopup(kisaAdres)
+        .openPopup();
 
-      document.getElementById("hedefDurum").innerHTML =
-        "📍 Hedef seçildi!";
+      document.getElementById(
+        "hedefDurum"
+      ).innerHTML =
+        "🎯 <b>Seçilen Hedef</b><br>" +
+        "📍 " + kisaAdres;
 
-      
+      document.getElementById(
+        "hedefOnay"
+      ).innerHTML =
+        "<br><button onclick=" +
+        "'secilenHedefiKaydet()'>" +
+        "✅ Bu hedefi kaydet</button>";
     });
   }
 
@@ -917,6 +911,7 @@ document.getElementById("hedefDurum").innerHTML =
     harita.invalidateSize();
   }, 200);
 }
+  
   const params = new URLSearchParams(window.location.search);
 
 if (params.get("hedef") === "ok") {
