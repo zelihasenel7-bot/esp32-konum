@@ -281,6 +281,16 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
   🕘 Konum Geçmişi
 </button>
 
+  <br><br>
+
+<button
+  type="button"
+  onclick="konumGecmisiniTemizle()"
+  style="color:#d93025;"
+>
+  🗑️ Konum Geçmişini Temizle
+</button>
+
 <div id="konumGecmisi" style="display:none;">
   <p>Henüz konum geçmişi gösterilmedi.</p>
 </div>
@@ -462,6 +472,25 @@ metreSayisi < 20
   );
 }
 
+  function konumGecmisiniTemizle() {
+  const onay = confirm(
+    "Konum geçmişindeki bütün kayıtlar silinsin mi?"
+  );
+
+  if (!onay) {
+    return;
+  }
+
+  localStorage.removeItem("mqttKonumGecmisi");
+
+  const alan =
+    document.getElementById("konumGecmisi");
+
+  alan.style.display = "block";
+  alan.innerHTML =
+    "📭 Konum geçmişi temizlendi.";
+}
+  
 function mqttKonumunuGecmiseEkle(veri) {
   const enlem = Number(veri.enlem);
   const boylam = Number(veri.boylam);
