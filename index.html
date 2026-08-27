@@ -347,6 +347,18 @@ document.getElementById("mqttHaritaButton").disabled = false;
     document.getElementById("mqttBoylam").textContent = veri.boylam ?? "-";
     document.getElementById("mqttMesafe").textContent =
       veri.mesafe !== undefined ? veri.mesafe + " metre" : "-";
+    const hedefMesafeAlani =
+  document.getElementById("mqttHedefMesafe");
+
+if (veri.hedefe_kalan >= 0) {
+  hedefMesafeAlani.textContent =
+    veri.hedefe_kalan >= 1000
+      ? (veri.hedefe_kalan / 1000).toFixed(2) + " km"
+      : veri.hedefe_kalan.toFixed(1) + " metre";
+} else {
+  hedefMesafeAlani.textContent =
+    "Henüz hedef seçilmedi";
+}
     document.getElementById("mqttDurum").textContent =
       veri.durum === "guvenli_bolge_icinde"
         ? "✅ İçinde"
