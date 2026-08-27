@@ -14,6 +14,50 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
+  @media (max-width: 600px) {
+  body {
+    padding: 12px;
+    margin: 0;
+  }
+
+  .kart {
+    width: auto;
+    max-width: 100%;
+    padding: 18px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  #durum {
+    margin: 16px 0;
+    font-size: 17px;
+  }
+
+  .mqtt-kart {
+    padding: 14px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .mqtt-kart button {
+    font-size: 15px !important;
+    padding: 10px 12px !important;
+  }
+
+  #mqttUyari {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  button {
+    max-width: 100%;
+    font-size: 17px;
+    padding: 14px 18px;
+  }
+}
+
   <style>
 
     body {
@@ -295,9 +339,9 @@ document.getElementById("mqttHaritaButton").disabled = false;
       veri.mesafe !== undefined ? veri.mesafe + " metre" : "-";
     document.getElementById("mqttDurum").textContent =
       veri.durum === "guvenli_bolge_icinde"
-        ? "İçinde ✅"
+        ? "✅ İçinde"
         : veri.durum === "guvenli_bolge_disi"
-          ? "Dışında ❌"
+          ? "❌ Dışında"
           : veri.durum ?? "-";
     document.getElementById("mqttSaat").textContent =
       new Date().toLocaleTimeString("tr-TR");
