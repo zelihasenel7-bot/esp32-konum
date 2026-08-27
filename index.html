@@ -281,16 +281,6 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
   🕘 Konum Geçmişi
 </button>
 
-  <br><br>
-
-<button
-  type="button"
-  onclick="konumGecmisiniTemizle()"
-  style="color:#d93025;"
->
-  🗑️ Konum Geçmişini Temizle
-</button>
-
 <div id="konumGecmisi" style="display:none;">
   <p>Henüz konum geçmişi gösterilmedi.</p>
 </div>
@@ -559,6 +549,13 @@ function konumGecmisiniGetir() {
       ")'>🗺️ Haritada Göster</button>" +
       "</div>";
   }
+
+  html +=
+  "<br><button type='button' " +
+  "onclick='konumGecmisiniTemizle()' " +
+  "style='color:#d93025;'>" +
+  "🗑️ Konum Geçmişini Temizle" +
+  "</button>";
 
   alan.innerHTML = html;
 } 
