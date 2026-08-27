@@ -274,6 +274,15 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
   ✅ Güvenli Bölgeyi Kaydet
 </button>
 
+  <br><br>
+
+<button
+  type="button"
+  onclick="guvenliMerkeziYenile()"
+>
+  📍 Bulunduğum Yeri Güvenli Merkez Yap
+</button>
+
 <p id="guvenliBolgeMesaj"></p>
   </div>
 
@@ -427,6 +436,34 @@ if (veri.durum === "guvenli_bolge_icinde") {
     sonMqttBoylam;
 
   window.location.href = haritaAdresi;
+}
+
+  function guvenliMerkeziYenile() {
+  if (!mqttBaglantisi.connected) {
+    alert("MQTT bağlantısı aktif değil.");
+    return;
+  }
+
+  const merkezTopic =
+    "zelis/gps/komut/210826/merkez-yenile";
+
+  mqttBaglantisi.publish(
+    merkezTopic,
+    JSON.stringify({
+      komut: "merkezi_yenile"
+    }),
+    function(error) {
+      if (error) {
+        alert(
+          "Güvenli merkez komutu gönderilemedi."
+        );
+      } else {
+        alert(
+          "Komut gönderildi. Şimdi konumunuzu gönderin."
+        );
+      }
+    }
+  );
 }
 
   function guvenliBolgeKaydet() {
