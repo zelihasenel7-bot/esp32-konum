@@ -386,31 +386,41 @@ if (veri.durum === "guvenli_bolge_icinde") {
   window.open(haritaAdresi, "_blank");
 }
 
-  async function guvenliBolgeKaydet() {
+  function guvenliBolgeKaydet() {
+  const metre =
+    document.getElementById("guvenliBolgeSec").value;
 
-  const metre = document.getElementById("guvenliBolgeSec").value;
-  const mesaj = document.getElementById("guvenliBolgeMesaj");
+  const mesaj =
+    document.getElementById("guvenliBolgeMesaj");
 
-  mesaj.innerHTML = "⏳ Güvenli bölge kaydediliyor...";
+  const guvenliBolgeTopic =
+    "zelis/gps/komut/210826/guvenli-bolge";
 
-  try {
-
-    const response = await fetch(
-      "http://172.20.10.2/guvenli-bolge-ayarla?metre=" +
-      encodeURIComponent(metre)
-    );
-
-    if (response.ok) {
-      mesaj.innerHTML =
-        "✅ Güvenli bölge " + metre + " metre olarak ayarlandı.";
-    } else {
-      mesaj.innerHTML = "❌ Güvenli bölge ayarlanamadı.";
-    }
-
-  } catch (error) {
-
-    mesaj.innerHTML = "❌ ESP32'ye ulaşılamadı.";
+  if (!mqttBaglantisi.connected) {
+    mesaj.innerHTML =
+      "❌ MQTT bağlantısı aktif değil.";
+    return;
   }
+
+  const ayarMesaji = JSON.stringify({
+    metre: Number(metre)
+  });
+
+  mqttBaglantisi.publish(
+    guvenliBolgeTopic,
+    ayarMesaji,
+    function(error) {
+      if (error) {
+        mesaj.innerHTML =
+          "❌ Güvenli bölge ayarı gönderilemedi.";
+      } else {
+        mesaj.innerHTML =
+          "✅ Güvenli bölge " +
+          metre +
+          " metre olarak gönderildi.";
+      }
+    }
+  );
 }
 
   async function konumGecmisiniGetir() {
