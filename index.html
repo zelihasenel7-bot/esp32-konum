@@ -1,21 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 
-<head>
-  <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width,initial-scale=1.0">
-
-  <title>ESP32 Konum</title>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-
-  <style>
-  body {
+<head>a
     font-family: Arial, sans-serif;
     text-align: center;
     background: #f3f3f3;
@@ -120,11 +106,14 @@
   <h1>📍 ESP32 Konum</h1>
 
   <p id="durum">
-    Konum alınmaya hazır.
+    📡 ESP32’nin GPS verisi bekleniyor.
   </p>
 
   <div class="mqtt-kart">
     <div id="mqttBaglanti">🟡 MQTT bağlantısı kuruluyor...</div>
+    <div>🛰️ GPS: <b id="gpsDurum">Bekleniyor</b></div>
+    <div>🛰️ Kullanılan uydu: <b id="gpsUydu">-</b></div>
+    <div>📶 HDOP (metre değil): <b id="gpsHdop">-</b></div>
     <div>📍 Enlem: <b id="mqttEnlem">-</b></div>
     <div>📍 Boylam: <b id="mqttBoylam">-</b></div>
     <div>📏 Güvenli merkeze uzaklık: <b id="mqttMesafe">-</b></div>
@@ -137,7 +126,7 @@
   <b id="mqttHedefMesafe">Henüz hedef seçilmedi</b>
 </div>
     <div>🛡️ Güvenli bölge: <b id="mqttDurum">-</b></div>
-    <div>🕐 Son güncelleme: <b id="mqttSaat">-</b></div>
+    <div>🕐 Son geçerli GPS ölçümü: <b id="mqttSaat">-</b></div>
 
     <button
   type="button"
@@ -159,9 +148,7 @@
 </div>
   </div>
 
-  <button onclick="konumAl()">
-    📍 Konumumu Gönder
-  </button>
+  <p>Konum GPS kartından otomatik gelir. Bu sayfa telefon konumunu göndermez.</p>
 
   <br><br>
 
@@ -280,7 +267,7 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
   type="button"
   onclick="guvenliMerkeziYenile()"
 >
-  📍 Bulunduğum Yeri Güvenli Merkez Yap
+  📍 GPS’nin Yerini Güvenli Merkez Yap
 </button>
 
 <p id="guvenliBolgeMesaj"></p>
@@ -303,125 +290,124 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
 
 <script>
 
-  let sonMqttEnlem = null;
-  let sonMqttBoylam = null;
-  let sonMqttMesajZamani = 0;
 
+let sonMqttEnlem = null, sonMqttBoylam = null;
+let sonMqttMesajZamani = 0, sonGecerliMesajZamani = 0;
+let sonGecmisZamani = 0, sonGpsZamani = "";
 const mqttTopic = "zelis/gps/test/210826";
+const cihazDurumTopic = "zelis/gps/durum/210826";
 const mqttClientId = "web-gps-" + Math.random().toString(16).slice(2, 10);
 const mqttBaglantisi = mqtt.connect("wss://test.mosquitto.org:8081/mqtt", {
-  clientId: mqttClientId,
-  clean: true,
-  connectTimeout: 10000,
-  reconnectPeriod: 3000
+  clientId: mqttClientId, clean: true, connectTimeout: 10000, reconnectPeriod: 3000
 });
 
+function alan(id, metin) { document.getElementById(id).textContent = metin; }
+function konumuGecersizYap(metin) {
+  sonMqttEnlem = sonMqttBoylam = null;
+  sonGecerliMesajZamani = 0;
+  alan("gpsDurum", metin);
+  alan("durum", metin);
+  alan("mqttEnlem", "-"); alan("mqttBoylam", "-");
+  alan("mqttMesafe", "Kontrol edilemiyor");
+  alan("mqttHedefMesafe", "Güncel GPS konumu yok");
+  alan("mqttDurum", "Kontrol edilemiyor");
+  document.getElementById("mqttHaritaButton").disabled = true;
+  document.getElementById("mqttUyari").style.display = "none";
+}
+function baglantiYaz(metin, renk) {
+  alan("mqttBaglanti", metin);
+  document.getElementById("mqttBaglanti").style.color = renk;
+}
+function baglantiKesildi() {
+  baglantiYaz("🟠 MQTT bağlantısı kesildi", "#b26a00");
+  konumuGecersizYap("Bağlantı yok; konum güncel değil.");
+}
 mqttBaglantisi.on("connect", function() {
-  document.getElementById("mqttBaglanti").textContent =
-    "🟢 MQTT bağlantısı aktif";
-  document.getElementById("mqttBaglanti").style.color = "#188038";
-
-  mqttBaglantisi.subscribe(mqttTopic);
+  sonMqttMesajZamani = Date.now();
+  baglantiYaz("🟢 MQTT aktif; ESP32 verisi bekleniyor", "#188038");
+  mqttBaglantisi.subscribe([mqttTopic, cihazDurumTopic]);
 });
-
-mqttBaglantisi.on("reconnect", function() {
-  document.getElementById("mqttBaglanti").textContent =
-    "🟡 MQTT yeniden bağlanıyor...";
-  document.getElementById("mqttBaglanti").style.color = "#b26a00";
-});
-
+mqttBaglantisi.on("reconnect", baglantiKesildi);
+mqttBaglantisi.on("close", baglantiKesildi);
+mqttBaglantisi.on("offline", baglantiKesildi);
 mqttBaglantisi.on("error", function() {
-  document.getElementById("mqttBaglanti").textContent =
-    "🔴 MQTT bağlantısı kurulamadı";
-  document.getElementById("mqttBaglanti").style.color = "#d93025";
+  baglantiKesildi();
+  baglantiYaz("🔴 MQTT bağlantısı kurulamadı", "#d93025");
 });
-
-mqttBaglantisi.on("message", function(topic, gelenMesaj) {
-  if (topic !== mqttTopic) return;
-
-  try {
-    const veri = JSON.parse(gelenMesaj.toString());
-    
-    mqttKonumunuGecmiseEkle(veri);
-
-    sonMqttMesajZamani = Date.now();
-
-document.getElementById("mqttBaglanti").textContent =
-  "🟢 MQTT bağlantısı aktif";
-
-document.getElementById("mqttBaglanti").style.color =
-  "#188038";
-
-    sonMqttEnlem = Number(veri.enlem);
-sonMqttBoylam = Number(veri.boylam);
-
-document.getElementById("mqttHaritaButton").disabled = false;
-
-    document.getElementById("mqttEnlem").textContent = veri.enlem ?? "-";
-    document.getElementById("mqttBoylam").textContent = veri.boylam ?? "-";
-    document.getElementById("mqttMesafe").textContent =
-      veri.mesafe !== undefined ? veri.mesafe + " metre" : "-";
-    document.getElementById("mqttYaricap").textContent =
-  veri.guvenli_yaricap !== undefined
-    ? veri.guvenli_yaricap + " metre"
-    : "-";
-
-    if (veri.guvenli_yaricap !== undefined) {
-  document.getElementById(
-    "guvenliBolgeSec"
-  ).value = veri.guvenli_yaricap;
-}
-    
-    const hedefMesafeAlani =
-  document.getElementById("mqttHedefMesafe");
-
-if (veri.hedefe_kalan >= 0) {
-  hedefMesafeAlani.textContent =
-    veri.hedefe_kalan >= 1000
-      ? (veri.hedefe_kalan / 1000).toFixed(2) + " km"
-      : veri.hedefe_kalan.toFixed(1) + " metre";
-} else {
-  hedefMesafeAlani.textContent =
-    "Henüz hedef seçilmedi";
-}
-    document.getElementById("mqttDurum").textContent =
-      veri.durum === "guvenli_bolge_icinde"
-        ? "✅ İçinde"
-        : veri.durum === "guvenli_bolge_disi"
-          ? "❌ Dışında"
-          : veri.durum ?? "-";
-    document.getElementById("mqttSaat").textContent =
-      new Date().toLocaleTimeString("tr-TR");
-
-    const uyari = document.getElementById("mqttUyari");
-    if (veri.yeni_uyari === true) {
-  uyari.style.display = "block";
-}
-
-if (veri.durum === "guvenli_bolge_icinde") {
-  uyari.style.display = "none";
-}
-  } catch (error) {
-    console.error("MQTT mesajı okunamadı:", error);
-  }
-});
-
-  setInterval(function() {
-  if (sonMqttMesajZamani === 0) {
+mqttBaglantisi.on("message", function(topic, gelenMesaj, packet) {
+  // Kaydedilmis eski bir paket yeni bir GPS olcumu degildir.
+  if (packet && packet.retain) return;
+  if (topic === cihazDurumTopic) {
+    if (gelenMesaj.toString() === "cevrimdisi") {
+      konumuGecersizYap("ESP32 çevrimdışı; güncel konum yok.");
+      baglantiYaz("🟠 ESP32 çevrimdışı", "#b26a00");
+    }
     return;
   }
-
-  const gecenSure =
-    Date.now() - sonMqttMesajZamani;
-
-  if (gecenSure > 15000) {
-    document.getElementById("mqttBaglanti").textContent =
-      "🟠 ESP32'den yeni veri alınamıyor";
-
-    document.getElementById("mqttBaglanti").style.color =
-      "#d97706";
+  if (topic !== mqttTopic) return;
+  try {
+    const veri = JSON.parse(gelenMesaj.toString());
+    if (veri.surum !== 2 || veri.kaynak !== "gps") return;
+    sonMqttMesajZamani = Date.now();
+    baglantiYaz("🟢 MQTT aktif; ESP32 verisi geliyor", "#188038");
+    alan("gpsUydu", Number.isInteger(veri.uydu) ? veri.uydu : "-");
+    alan("gpsHdop", typeof veri.hdop === "number" && Number.isFinite(veri.hdop) ? veri.hdop.toFixed(2) : "-");
+    if (typeof veri.guvenli_yaricap === "number" && veri.guvenli_yaricap >= 20) {
+      alan("mqttYaricap", veri.guvenli_yaricap + " metre");
+      const giris = document.getElementById("guvenliBolgeSec");
+      if (document.activeElement !== giris && !giris.dataset.dirty) giris.value = veri.guvenli_yaricap;
+    }
+    const olcumZamani = typeof veri.gps_zamani === "string" ? Date.parse(veri.gps_zamani) : NaN;
+    const yas = Date.now() - olcumZamani;
+    const guncel = veri.gps_gecerli === true &&
+      typeof veri.enlem === "number" && Number.isFinite(veri.enlem) && Math.abs(veri.enlem) <= 90 &&
+      typeof veri.boylam === "number" && Number.isFinite(veri.boylam) && Math.abs(veri.boylam) <= 180 &&
+      typeof veri.olcum_yasi_ms === "number" && veri.olcum_yasi_ms >= 0 && veri.olcum_yasi_ms < 5000 &&
+      Number.isFinite(olcumZamani) && yas >= -30000 && yas < 15000;
+    if (!guncel) {
+      konumuGecersizYap(veri.gps_gecerli === true ?
+        "GPS ölçümü eski veya saatler uyumsuz. Cihazınızın otomatik tarih/saat ayarını kontrol edin." :
+        "GPS sinyali bekleniyor; güncel konum yok.");
+      return;
+    }
+    sonGecerliMesajZamani = Date.now();
+    sonMqttEnlem = veri.enlem; sonMqttBoylam = veri.boylam;
+    alan("mqttEnlem", veri.enlem.toFixed(6));
+    alan("mqttBoylam", veri.boylam.toFixed(6));
+    document.getElementById("mqttHaritaButton").disabled = false;
+    alan("mqttSaat", new Date(olcumZamani).toLocaleString("tr-TR"));
+    alan("gpsDurum", "✅ Geçerli GPS konumu");
+    alan("durum", "📍 ESP32’nin GPS konumu otomatik güncelleniyor.");
+    const uygun = veri.kontrol_uygun === true;
+    alan("mqttMesafe", uygun && typeof veri.mesafe === "number" && veri.mesafe >= 0 ?
+      veri.mesafe.toFixed(1) + " metre" : "Ölçüm kalitesi bekleniyor");
+    alan("mqttHedefMesafe", !veri.hedef_var ? "Henüz hedef seçilmedi" :
+      uygun && typeof veri.hedefe_kalan === "number" && veri.hedefe_kalan >= 0 ?
+      (veri.hedefe_kalan >= 1000 ? (veri.hedefe_kalan / 1000).toFixed(2) + " km" :
+        veri.hedefe_kalan.toFixed(1) + " metre") : "Ölçüm kalitesi bekleniyor");
+    alan("mqttDurum", !uygun ? "GPS kalitesi yetersiz; kontrol edilemiyor" :
+      veri.durum === "guvenli_bolge_icinde" ? "✅ İçinde" :
+      veri.durum === "guvenli_bolge_disi" ? "❌ Dışında" : "Kontrol edilemiyor");
+    const uyari = document.getElementById("mqttUyari");
+    if (!uygun || veri.durum === "guvenli_bolge_icinde") uyari.style.display = "none";
+    else if (veri.yeni_uyari === true && veri.durum === "guvenli_bolge_disi") uyari.style.display = "block";
+    if (veri.gps_zamani !== sonGpsZamani && (!sonGecmisZamani || Date.now() - sonGecmisZamani >= 10000)) {
+      try { mqttKonumunuGecmiseEkle(veri); } catch (e) { console.warn("Geçmiş kaydedilemedi", e); }
+      sonGecmisZamani = Date.now(); sonGpsZamani = veri.gps_zamani;
+    }
+  } catch (error) { console.error("MQTT mesajı okunamadı:", error); }
+});
+document.getElementById("guvenliBolgeSec").addEventListener("input", function() { this.dataset.dirty = "1"; });
+setInterval(function() {
+  if (sonGecerliMesajZamani && Date.now() - sonGecerliMesajZamani > 8000) {
+    konumuGecersizYap("GPS ölçümü güncellenmiyor.");
   }
-}, 3000);
+  if (sonMqttMesajZamani && Date.now() - sonMqttMesajZamani > 15000) {
+    baglantiYaz("🟠 ESP32’den yeni veri alınamıyor", "#d97706");
+    konumuGecersizYap("ESP32 verisi kesildi; güncel konum yok.");
+    alan("gpsUydu", "-"); alan("gpsHdop", "-");
+  }
+}, 1000);
 
   function mqttKonumuHaritadaGoster() {
   if (sonMqttEnlem === null || sonMqttBoylam === null) {
@@ -460,7 +446,7 @@ if (veri.durum === "guvenli_bolge_icinde") {
         );
       } else {
         alert(
-          "Komut gönderildi. Şimdi konumunuzu gönderin."
+          "Komut gönderildi. ESP32 sonraki uygun GPS ölçümünü güvenli merkez yapacak."
         );
       }
     }
@@ -478,10 +464,10 @@ if (veri.durum === "guvenli_bolge_icinde") {
 
 if (
   !Number.isInteger(metreSayisi) ||
-metreSayisi < 20
+metreSayisi < 20 || metreSayisi > 1000000
 ) {
   mesaj.innerHTML =
-  "❌ En az 20 metre olacak şekilde tam sayı girin.";
+  "❌ 20–1000000 metre arasında tam sayı girin.";
   return;
 }
 
@@ -494,6 +480,7 @@ metreSayisi < 20
     return;
   }
 
+  document.getElementById("guvenliBolgeSec").dataset.dirty = "";
   const ayarMesaji = JSON.stringify({
     metre: metreSayisi
   });
@@ -535,8 +522,10 @@ metreSayisi < 20
 }
   
 function mqttKonumunuGecmiseEkle(veri) {
-  const enlem = Number(veri.enlem);
-  const boylam = Number(veri.boylam);
+  if (veri.kaynak !== "gps" || veri.gps_gecerli !== true ||
+      typeof veri.enlem !== "number" || typeof veri.boylam !== "number") return;
+  const enlem = veri.enlem;
+  const boylam = veri.boylam;
 
   if (
     !Number.isFinite(enlem) ||
@@ -545,15 +534,16 @@ function mqttKonumunuGecmiseEkle(veri) {
     return;
   }
 
-  let gecmis = JSON.parse(
-    localStorage.getItem("mqttKonumGecmisi") ||
-    "[]"
-  );
+  let gecmis;
+  try { gecmis = JSON.parse(localStorage.getItem("mqttKonumGecmisi") || "[]"); }
+  catch (_) { gecmis = []; }
+  if (!Array.isArray(gecmis)) gecmis = [];
 
   gecmis.push({
     enlem: enlem,
     boylam: boylam,
-    saat: new Date().toLocaleString("tr-TR")
+    kaynak: "gps",
+    saat: new Date(veri.gps_zamani).toLocaleString("tr-TR")
   });
 
   gecmis = gecmis.slice(-10);
@@ -592,6 +582,7 @@ function konumGecmisiniGetir() {
       "border:1px solid #ccc;" +
       "border-radius:10px;'>" +
       "🕐 <b>" + kayit.saat + "</b><br>" +
+      (kayit.kaynak === "gps" ? "GPS kaydı<br>" : "Önceki kayıt (GPS öncesi)<br>") +
       "📍 " +
       kayit.enlem.toFixed(6) + ", " +
       kayit.boylam.toFixed(6) +
@@ -813,82 +804,6 @@ function secilenHedefiKaydet() {
   );
 }
 
-function konumAl() {
-
-  document.getElementById("durum").innerHTML =
-    "📡 Konum aranıyor...";
-
-  if (!navigator.geolocation) {
-
-    document.getElementById("durum").innerHTML =
-      "❌ Telefon konum özelliğini desteklemiyor.";
-
-    return;
-  }
-
-
-  navigator.geolocation.getCurrentPosition(
-
-    function(position) {
-
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      const acc = position.coords.accuracy;
-      const simdi = new Date();
-const saat = simdi.toLocaleTimeString("tr-TR");
-
-      document.getElementById("durum").innerHTML =
-        "✅ Konum bulundu! ESP32'ye gönderiliyor...";
-
-  const telefonKonumTopic =
-  "zelis/gps/komut/210826/telefon-konumu";
-
-const konumMesaji = JSON.stringify({
-  enlem: lat,
-  boylam: lon,
-  dogruluk: acc,
-  saat: saat,
-  kaynak: "telefon"
-});
-
-if (mqttBaglantisi.connected) {
-  mqttBaglantisi.publish(
-    telefonKonumTopic,
-    konumMesaji,
-    function(error) {
-      if (error) {
-        document.getElementById("durum").innerHTML =
-          "❌ Konum MQTT ile gönderilemedi.";
-      } else {
-        document.getElementById("durum").innerHTML =
-          "✅ Konum MQTT ile gönderildi.";
-      }
-    }
-  );
-} else {
-  document.getElementById("durum").innerHTML =
-    "❌ MQTT bağlantısı aktif değil.";
-}
-    },
-
-
-    function(error) {
-
-      document.getElementById("durum").innerHTML =
-        "❌ Konum alınamadı. Hata kodu: " + error.code;
-
-    },
-
-
-    {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    }
-
-  );
-}
-
   let harita;
 let hedefMarker;
 let secilenHedefLat = null;
@@ -1011,3 +926,6 @@ document.getElementById("guvenliBolgeButton").style.display = "inline-block";
 });
 </script>
 
+
+</body>
+</html>
