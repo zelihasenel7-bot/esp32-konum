@@ -3,12 +3,16 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1.0">
+
   <title>ESP32 Konum</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
   <style>
   body {
@@ -136,6 +140,7 @@
   <b id="mqttHedefMesafe">Henüz hedef seçilmedi</b>
 </div>
     <div>🛡️ Güvenli bölge: <b id="mqttDurum">-</b></div>
+    <div>🎯 Hedef kaydı: <b id="mqttHedefKaydi">ESP32 bilgisi bekleniyor</b></div>
     <div>🕐 Son geçerli GPS ölçümü: <b id="mqttSaat">-</b></div>
 
     <button
@@ -224,6 +229,7 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
 
 <div id="harita" style="display:none; height:350px; margin-top:20px;"></div>
   <div id="hedefOnay"></div>
+  <p id="hedefKayitDurumu" role="status" aria-live="polite"></p>
 
   <hr>
 
@@ -304,6 +310,8 @@ style="position:absolute;right:10px;top:5px;font-size:26px;line-height:1;color:#
 let sonMqttEnlem = null, sonMqttBoylam = null;
 let sonMqttMesajZamani = 0, sonGecerliMesajZamani = 0;
 let sonGecmisZamani = 0, sonGpsZamani = "";
+let bekleyenHedef = null;
+let sonHedefIstekId = 0;
 const mqttTopic = "zelis/gps/test/210826";
 const cihazDurumTopic = "zelis/gps/durum/210826";
 const mqttClientId = "web-gps-" + Math.random().toString(16).slice(2, 10);
@@ -312,6 +320,27 @@ const mqttBaglantisi = mqtt.connect("wss://test.mosquitto.org:8081/mqtt", {
 });
 
 function alan(id, metin) { document.getElementById(id).textContent = metin; }
+function hedefOnayiniIsle(veri) {
+  const koordinatlarGecerli = typeof veri.hedef_enlem === "number" && Number.isFinite(veri.hedef_enlem) &&
+    Math.abs(veri.hedef_enlem) <= 90 && typeof veri.hedef_boylam === "number" &&
+    Number.isFinite(veri.hedef_boylam) && Math.abs(veri.hedef_boylam) <= 180;
+  alan("mqttHedefKaydi", veri.hedef_kayitli === true && koordinatlarGecerli ?
+    "✅ ESP32’de kayıtlı (" + veri.hedef_enlem.toFixed(6) + ", " + veri.hedef_boylam.toFixed(6) + ")" :
+    veri.hedef_kayitli === false ? (veri.hedef_var ? "Kayıt doğrulanamadı" : "Henüz hedef yok") :
+    "Bu ESP32 sürümü kayıt onayı göndermiyor");
+  if (!bekleyenHedef || veri.hedef_onay_id !== bekleyenHedef.id) return;
+  if (veri.hedef_kayitli === false) {
+    clearTimeout(bekleyenHedef.timer);
+    alan("hedefKayitDurumu", "❌ ESP32 hedef kaydını doğrulayamadı. Tekrar deneyin.");
+    bekleyenHedef = null;
+  } else if (veri.hedef_kayitli === true && koordinatlarGecerli &&
+    Math.abs(veri.hedef_enlem - bekleyenHedef.lat) < 0.000001 &&
+    Math.abs(veri.hedef_boylam - bekleyenHedef.lon) < 0.000001) {
+    clearTimeout(bekleyenHedef.timer);
+    alan("hedefKayitDurumu", "✅ Hedef ESP32’ye kaydedildi.");
+    bekleyenHedef = null;
+  }
+}
 function konumuGecersizYap(metin) {
   sonMqttEnlem = sonMqttBoylam = null;
   sonGecerliMesajZamani = 0;
@@ -329,6 +358,7 @@ function baglantiYaz(metin, renk) {
   document.getElementById("mqttBaglanti").style.color = renk;
 }
 function baglantiKesildi() {
+  alan("mqttHedefKaydi", "Bağlantı yok; son kayıt durumu doğrulanamıyor");
   baglantiYaz("🟠 MQTT bağlantısı kesildi", "#b26a00");
   konumuGecersizYap("Bağlantı yok; konum güncel değil.");
 }
@@ -349,6 +379,7 @@ mqttBaglantisi.on("message", function(topic, gelenMesaj, packet) {
   if (packet && packet.retain) return;
   if (topic === cihazDurumTopic) {
     if (gelenMesaj.toString() === "cevrimdisi") {
+      alan("mqttHedefKaydi", "ESP32 çevrimdışı; kayıt durumu doğrulanamıyor");
       konumuGecersizYap("ESP32 çevrimdışı; güncel konum yok.");
       baglantiYaz("🟠 ESP32 çevrimdışı", "#b26a00");
     }
@@ -360,6 +391,7 @@ mqttBaglantisi.on("message", function(topic, gelenMesaj, packet) {
     if (veri.surum !== 2 || veri.kaynak !== "gps") return;
     sonMqttMesajZamani = Date.now();
     baglantiYaz("🟢 MQTT aktif; ESP32 verisi geliyor", "#188038");
+    hedefOnayiniIsle(veri);
     alan("gpsUydu", Number.isInteger(veri.uydu) ? veri.uydu : "-");
     alan("gpsHdop", typeof veri.hdop === "number" && Number.isFinite(veri.hdop) ? veri.hdop.toFixed(2) : "-");
     if (typeof veri.guvenli_yaricap === "number" && veri.guvenli_yaricap >= 20) {
@@ -414,6 +446,7 @@ setInterval(function() {
   }
   if (sonMqttMesajZamani && Date.now() - sonMqttMesajZamani > 15000) {
     baglantiYaz("🟠 ESP32’den yeni veri alınamıyor", "#d97706");
+    alan("mqttHedefKaydi", "ESP32 verisi yok; kayıt durumu doğrulanamıyor");
     konumuGecersizYap("ESP32 verisi kesildi; güncel konum yok.");
     alan("gpsUydu", "-"); alan("gpsHdop", "-");
   }
@@ -792,7 +825,21 @@ function secilenHedefiKaydet() {
   const hedefTopic =
     "zelis/gps/komut/210826/hedef";
 
+  if (bekleyenHedef) clearTimeout(bekleyenHedef.timer);
+  sonHedefIstekId = Math.max(sonHedefIstekId + 1, Date.now() * 1000 + Math.floor(Math.random() * 1000));
+  const istek = {
+    id: sonHedefIstekId,
+    lat: secilenHedefLat, lon: secilenHedefLon, timer: null
+  };
+  bekleyenHedef = istek;
+  alan("hedefKayitDurumu", "⏳ Hedef gönderiliyor; ESP32 kayıt onayı bekleniyor…");
+  istek.timer = setTimeout(function() {
+    if (bekleyenHedef === istek) {
+      alan("hedefKayitDurumu", "⚠️ ESP32 kayıt onayı henüz gelmedi. Bağlantıyı kontrol edin; hedefin kaydedildiği kesinleşmedi.");
+    }
+  }, 15000);
   const hedefMesaji = JSON.stringify({
+    istek_id: istek.id,
     enlem: secilenHedefLat,
     boylam: secilenHedefLon,
     adres: secilenHedefAdres
@@ -801,14 +848,15 @@ function secilenHedefiKaydet() {
   mqttBaglantisi.publish(
     hedefTopic,
     hedefMesaji,
+    { qos: 1, retain: false },
     function(error) {
+      if (bekleyenHedef !== istek) return;
       if (error) {
-        alert("Hedef gönderilemedi.");
+        clearTimeout(istek.timer);
+        bekleyenHedef = null;
+        alan("hedefKayitDurumu", "❌ Hedef gönderilemedi; kayıt doğrulanmadı.");
       } else {
-        document.getElementById("hedefDurum").innerHTML =
-          "✅ Hedef MQTT ile gönderildi!<br><br>" +
-          "🎯 <b>Seçilen Hedef</b><br>" +
-          "📍 " + secilenHedefAdres;
+        alan("hedefKayitDurumu", "⏳ Hedef MQTT ile gönderildi; ESP32 kayıt onayı bekleniyor…");
       }
     }
   );
