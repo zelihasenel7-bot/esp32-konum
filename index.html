@@ -5,10 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f8f7">
 <meta name="apple-mobile-web-app-title" content="Konum">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Konum · ESP32</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/mqtt@5.10.4/dist/mqtt.min.js"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 :root{color-scheme:light;--ink:#182e38;--muted:#5c7079;--teal:#087e76;--surface:#fff;--bg:#f3f7f5;--line:#dfe8e5}
 *{box-sizing:border-box}body{margin:0;background:#e8efec;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}button,input{font:inherit}button{cursor:pointer;border:0}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #31aaa0;outline-offset:3px}button{min-height:44px;padding:12px 17px;border-radius:13px;background:#eaf2ef;color:var(--ink);font-weight:600}button:hover:not(:disabled){filter:brightness(.96)}input{width:100%;min-height:48px;border:1px solid #cad8d2;border-radius:12px;padding:12px;background:#fff;color:var(--ink);font-size:16px}h1,h2,h3,p{margin-top:0}h1{font-size:23px;font-weight:650;letter-spacing:-.6px;margin:0}h2{font-size:23px;letter-spacing:-.5px;margin-bottom:6px}h3{font-size:16px;margin-bottom:12px}p{line-height:1.6}.muted{color:var(--muted)}.app{max-width:520px;min-height:100svh;background:var(--bg);margin:auto;position:relative;padding-bottom:calc(90px + env(safe-area-inset-bottom))}.topbar{padding:22px 22px 14px;background:var(--surface);border-bottom:1px solid var(--line)}.brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:10px}.logo{width:35px;height:35px;border-radius:11px;background:var(--teal);color:#fff;display:grid;place-items:center}.device-label{font-size:11px;letter-spacing:1.4px;color:var(--muted)}.connection{font-size:12px;display:flex;align-items:center;gap:8px;margin-top:15px;min-height:24px}#baglantiNoktasi{width:7px;height:7px;border-radius:50%;background:#b26a00;flex:none}#mqttBaglanti{overflow-wrap:anywhere}.map-wrap{position:relative;background:#e4eeea;height:clamp(285px,42svh,420px)}#canliHarita{height:100%;width:100%;z-index:0}.map-label{position:absolute;left:14px;right:14px;top:14px;z-index:400;pointer-events:none;display:flex;justify-content:space-between;gap:8px}.map-label span{font-size:11px;padding:6px 10px;border-radius:20px;background:#ffffffee;box-shadow:0 2px 8px #1b3a3012}.locate{position:absolute;right:14px;bottom:42px;z-index:400;background:white;box-shadow:0 3px 12px #17352d20;width:44px;padding:10px}.sheet{position:relative;z-index:500;margin:-26px 14px 0;padding:20px;background:white;border-radius:23px;box-shadow:0 8px 30px #17382c0c}.handle{height:4px;width:32px;border-radius:5px;background:#dce5e0;margin:-8px auto 18px}.sheet h2{font-size:19px}.sheet #durum{font-size:13px;color:var(--muted);margin:0 0 17px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:16px}.stat{min-width:0}.stat+.stat{border-left:1px solid var(--line);padding-left:16px}.eyebrow{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}.stat strong{font-weight:650;font-size:18px;display:block;line-height:1.35;overflow-wrap:anywhere}.stat small{font-size:12px;color:var(--muted);display:block;margin-top:7px}.detail{margin-top:20px;border-top:1px solid var(--line);padding-top:12px}.detail summary{padding:7px 0;cursor:pointer;font-size:13px;color:var(--muted)}.detail-row{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:9px 0;font-size:13px}.detail-row span{color:var(--muted)}.detail-row b{font-weight:500;text-align:right;overflow-wrap:anywhere;max-width:65%}.text-action{background:transparent;color:var(--teal);padding:10px 0;font-size:13px}.page{padding:26px 20px}.page-intro{font-size:13px;color:var(--muted);margin-bottom:23px}.panel{padding:18px;border:1px solid var(--line);border-radius:18px;background:#fff;margin:18px 0}.primary{background:var(--teal);color:white;width:100%}.secondary{width:100%;background:white;border:1px solid var(--line)}.field{display:block;font-size:13px;font-weight:600;margin:15px 0 7px}.close-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.close-row h3{margin:0}.close{background:var(--bg);padding:9px;width:44px}.space{margin-top:12px}.fineprint{font-size:12px;color:var(--muted)}#mqttHedefKaydi,#hedefKayitDurumu,#hedefDurum{overflow-wrap:anywhere}#hedefKayitDurumu{font-size:14px;padding:0 3px}#hedefKayitDurumu:empty{display:none}#harita{height:320px;border-radius:16px;margin-top:16px;z-index:0}#hedefDurum button{width:100%!important;margin:5px 0!important;text-align:left;font-size:13px}#hedefOnay button{background:var(--teal);color:white;width:100%}#konumGecmisi button{font-size:13px}#konumGecmisi>div{border-color:var(--line)!important;background:white;border-radius:16px!important;font-size:13px}#mqttUyari{display:none;margin:16px 14px 0;padding:16px;border-radius:15px;background:#fff0eb;color:#9e321f;border:1px solid #f0c5b9;font-size:14px}#mqttUyari button{background:transparent;float:right;color:inherit;padding:0 8px;margin-top:-10px}.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:1000;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:#fffffffa;border-top:1px solid var(--line);box-shadow:0 -6px 24px #19352906}.bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:transparent;color:var(--muted);border-radius:12px;font-size:11px;font-weight:500;padding:8px 2px;min-height:56px}.bottom-nav button[aria-selected=true]{background:#e8f4ef;color:var(--teal)}.icon{width:21px;height:21px;display:inline-block;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.unit-input{display:flex;align-items:center;gap:12px}.unit-input input{width:140px}.subnote{padding:14px 22px;font-size:11px;color:var(--muted);text-align:center}.map-error{position:absolute;bottom:50px;left:15px;right:70px;z-index:400;background:white;border-radius:12px;padding:10px;font-size:12px}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:10px!important}button svg{pointer-events:none}[hidden]{display:none!important}@media(min-width:700px){body{padding:25px 0}.app{border:1px solid var(--line);border-radius:24px 24px 0 0;overflow:hidden;min-height:calc(100svh - 25px)}}@media(max-width:360px){.page{padding:22px 14px}.topbar{padding:18px 16px 12px}.sheet{padding:17px}.stat strong{font-size:16px}}
@@ -49,6 +54,23 @@ let sonHedefIstekId = 0;
 const bekleyenKomutlar = new Map();
 let sonGuvenliBolgeBildirimi = 0;
 let uyariSesBaglami = null;
+let oneSignalHazir = false;
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.OneSignalDeferred.push(async function(OneSignal) {
+  try {
+    await OneSignal.init({
+      appId: "404a2ffc-c0c2-4dde-a726-952a2a1d6794",
+      serviceWorkerPath: "/esp32-konum/OneSignalSDKWorker.js",
+      serviceWorkerParam: { scope: "/esp32-konum/" },
+      allowLocalhostAsSecureOrigin: false
+    });
+    oneSignalHazir = true;
+    bildirimAyariniGuncelle();
+    OneSignal.Notifications.addEventListener("permissionChange", bildirimAyariniGuncelle);
+  } catch (error) {
+    alan("bildirimDurumu", "Bildirim servisi başlatılamadı. İnternet bağlantısını kontrol edin.");
+  }
+});
 const mqttTopic = "zelis/gps/test/210826";
 const cihazDurumTopic = "zelis/gps/durum/210826";
 const mqttClientId = "web-gps-" + Math.random().toString(16).slice(2, 10);
@@ -111,34 +133,56 @@ function alan(id, metin) {
 function bildirimAyariniGuncelle() {
   const durum = document.getElementById("bildirimDurumu");
   const dugme = document.getElementById("bildirimButton");
-  if (!("Notification" in window)) {
-    durum.textContent = "iPhone’da sistem bildirimi için sayfayı Ana Ekran’a eklemek gerekir. Sayfa açıkken kırmızı uyarı yine gösterilir.";
-    dugme.textContent = "Bildirim desteği bilgisi";
+  const uygulamaModu = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches ||
+    typeof navigator !== "undefined" && navigator.standalone === true;
+  if (!uygulamaModu) {
+    durum.textContent = "iPhone’da bildirimi açmak için önce bu sayfayı Ana Ekran’a ekleyin ve Konum simgesinden açın.";
+    dugme.textContent = "Önce Ana Ekran’a ekleyin";
     return;
   }
-  if (Notification.permission === "granted" && localStorage.getItem("guvenliBolgeBildirimi") === "acik") {
-    durum.textContent = "✅ Bildirimler açık.";
-    dugme.textContent = "Bildirimler açık";
-  } else if (Notification.permission === "denied") {
-    durum.textContent = "Bildirim izni kapalı. Telefonun tarayıcı ayarlarından izin vermen gerekir.";
-  } else {
-    durum.textContent = "Henüz bildirim izni verilmedi.";
+  if (!oneSignalHazir) {
+    durum.textContent = "Bildirim servisi hazırlanıyor…";
+    dugme.textContent = "Bildirimleri aç";
+    return;
   }
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    if (OneSignal.Notifications.permission) {
+      localStorage.setItem("guvenliBolgeBildirimi", "acik");
+      durum.textContent = "✅ Sistem bildirimleri açık.";
+      dugme.textContent = "Bildirimler açık";
+      dugme.disabled = true;
+    } else {
+      durum.textContent = "Bildirim izni henüz verilmedi.";
+      dugme.textContent = "Bildirimleri aç";
+      dugme.disabled = false;
+    }
+  });
 }
 async function bildirimleriAc() {
+  const uygulamaModu = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches ||
+    typeof navigator !== "undefined" && navigator.standalone === true;
+  if (!uygulamaModu) {
+    bildirimAyariniGuncelle();
+    return;
+  }
+  if (!oneSignalHazir) {
+    alan("bildirimDurumu", "Bildirim servisi hazırlanıyor; birkaç saniye sonra tekrar deneyin.");
+    return;
+  }
   try {
     const SesBaglami = window.AudioContext || window.webkitAudioContext;
     if (SesBaglami && !uyariSesBaglami) uyariSesBaglami = new SesBaglami();
     if (uyariSesBaglami && uyariSesBaglami.state === "suspended") await uyariSesBaglami.resume();
-    if (!("Notification" in window)) {
+    window.OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.Notifications.requestPermission();
+      if (OneSignal.Notifications.permission) {
+        await OneSignal.User.PushSubscription.optIn();
+        localStorage.setItem("guvenliBolgeBildirimi", "acik");
+      }
       bildirimAyariniGuncelle();
-      return;
-    }
-    const izin = await Notification.requestPermission();
-    if (izin === "granted") localStorage.setItem("guvenliBolgeBildirimi", "acik");
-    bildirimAyariniGuncelle();
+    });
   } catch (error) {
-    alan("bildirimDurumu", "Bildirim izni açılamadı. Tarayıcı ayarlarını kontrol edin.");
+    alan("bildirimDurumu", "Bildirim izni açılamadı. iPhone ayarlarını kontrol edin.");
   }
 }
 function guvenliBolgeUyarisiGoster() {
@@ -153,10 +197,6 @@ function guvenliBolgeUyarisiGoster() {
     ses.frequency.value = 880; sesSeviyesi.gain.value = 0.08;
     ses.connect(sesSeviyesi); sesSeviyesi.connect(uyariSesBaglami.destination);
     ses.start(); ses.stop(uyariSesBaglami.currentTime + 0.35);
-  }
-  if ("Notification" in window && Notification.permission === "granted" &&
-      localStorage.getItem("guvenliBolgeBildirimi") === "acik") {
-    new Notification("Güvenli bölge uyarısı", { body: "ESP32 güvenli bölgenin dışına çıktı." });
   }
 }
 bildirimAyariniGuncelle();
