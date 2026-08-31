@@ -28,7 +28,7 @@
 <section id="ekran-hedef" class="page" role="tabpanel" aria-labelledby="tab-hedef" hidden><h2>Hedefim</h2><p class="page-intro">Bir yer ara veya haritadan seç.</p><div class="panel"><span class="eyebrow">Cihazdaki hedef kaydı</span><p id="mqttHedefKaydi" role="status">ESP32 bilgisi bekleniyor</p><span class="eyebrow">Hedefe kalan</span><strong id="hedefMesafeOzet">Güncel GPS konumu yok</strong></div><button type="button" class="primary" id="hedefBelirleButton" onclick="hedefAlaniniAc()">Hedef belirle</button>
 <div id="hedefSecimAlani" class="panel" style="display:none"><div class="close-row"><h3>Yeni hedef</h3><button type="button" class="close" aria-label="Hedef seçimini kapat" onclick="hedefAlaniniKapat()"><svg class="icon"><use href="#i-close"/></svg></button></div><label class="field" for="hedefArama">Yer veya adres</label><input type="text" id="hedefArama" placeholder="Örneğin Kızılay" autocomplete="off"><button class="primary space" type="button" onclick="ilAdiminiGoster()">Hedefi ara</button><div id="ilAdimi" style="display:none"><label class="field" for="hedefIl">İl</label><input type="text" id="hedefIl" placeholder="Örneğin Ankara"><button class="primary space" type="button" onclick="hedefAra()">Sonuçları göster</button></div><p id="hedefDurum" class="space" role="status"></p><button class="secondary" type="button" onclick="hedefSec()">Haritadan seç</button></div><div id="harita" style="display:none" aria-label="Hedef seçim haritası"></div><div id="hedefOnay"></div><p id="hedefKayitDurumu" role="status" aria-live="polite"></p></section>
 <section id="ekran-gecmis" class="page" role="tabpanel" aria-labelledby="tab-gecmis" hidden><h2>Konum geçmişi</h2><p class="page-intro">Son 10 kayıt · Yalnızca bu tarayıcıda tutulur.</p><div id="konumGecmisi"><p>Henüz konum kaydı yok.</p></div><button type="button" class="secondary space" onclick="konumGecmisiniGetir()">Kayıtları yenile</button></section>
-<section id="ekran-ayarlar" class="page" role="tabpanel" aria-labelledby="tab-ayarlar" hidden><h2>Ayarlar</h2><p class="page-intro">Cihaz ve güvenli bölge</p><div class="panel"><div class="detail-row"><span>Cihaz</span><b>ESP32</b></div><div class="detail-row"><span>Konum kaynağı</span><b>GPS modülü</b></div><div class="detail-row"><span>Cihazdan gelen yarıçap</span><b id="ayarYaricap">—</b></div></div><button type="button" id="guvenliBolgeButton" class="primary" onclick="guvenliBolgeAlaniniAc()">Güvenli bölgeyi düzenle</button><div id="guvenliBolgeAlani" class="panel" style="display:none"><div class="close-row"><h3>Güvenli bölge</h3><button type="button" class="close" aria-label="Güvenli bölge ayarını kapat" onclick="guvenliBolgeAlaniniKapat()"><svg class="icon"><use href="#i-close"/></svg></button></div><label class="field" for="guvenliBolgeSec">Yarıçap</label><div class="unit-input"><input type="number" id="guvenliBolgeSec" min="20" max="1000000" step="1" value="20" inputmode="numeric"><span>metre</span></div><button class="primary space" type="button" onclick="guvenliBolgeKaydet()">Yarıçapı gönder</button><p id="guvenliBolgeMesaj" role="status"></p><hr><p class="fineprint">Merkezi yenilersen bir sonraki uygun GPS ölçümü yeni merkez olur.</p><button type="button" class="secondary" onclick="guvenliMerkeziYenile()">Güvenli merkezi yenile</button></div><p class="fineprint space">Deneme sistemi: Ortak MQTT sunucusunda erişim yetkilendirmesi yoktur. Hassas konum takibi için uygun değildir.</p></section>
+<section id="ekran-ayarlar" class="page" role="tabpanel" aria-labelledby="tab-ayarlar" hidden><h2>Ayarlar</h2><p class="page-intro">Cihaz ve güvenli bölge</p><div class="panel"><div class="detail-row"><span>Cihaz</span><b>ESP32</b></div><div class="detail-row"><span>Konum kaynağı</span><b>GPS modülü</b></div><div class="detail-row"><span>Cihazdan gelen yarıçap</span><b id="ayarYaricap">—</b></div></div><div class="panel"><h3>Güvenli bölge bildirimi</h3><p class="fineprint">Cihaz güvenli bölgeden çıkınca bu telefonda uyarı gösterir.</p><button type="button" id="bildirimButton" class="secondary" onclick="bildirimleriAc()">Bildirimleri aç</button><p id="bildirimDurumu" class="fineprint space" role="status"></p></div><button type="button" id="guvenliBolgeButton" class="primary" onclick="guvenliBolgeAlaniniAc()">Güvenli bölgeyi düzenle</button><div id="guvenliBolgeAlani" class="panel" style="display:none"><div class="close-row"><h3>Güvenli bölge</h3><button type="button" class="close" aria-label="Güvenli bölge ayarını kapat" onclick="guvenliBolgeAlaniniKapat()"><svg class="icon"><use href="#i-close"/></svg></button></div><label class="field" for="guvenliBolgeSec">Yarıçap</label><div class="unit-input"><input type="number" id="guvenliBolgeSec" min="20" max="1000000" step="1" value="20" inputmode="numeric"><span>metre</span></div><button class="primary space" type="button" onclick="guvenliBolgeKaydet()">Yarıçapı gönder</button><p id="guvenliBolgeMesaj" role="status"></p><hr><p class="fineprint">Merkezi yenilersen bir sonraki uygun GPS ölçümü yeni merkez olur.</p><button type="button" class="secondary" onclick="guvenliMerkeziYenile()">Güvenli merkezi yenile</button></div><p class="fineprint space">Deneme sistemi: Ortak MQTT sunucusunda erişim yetkilendirmesi yoktur. Hassas konum takibi için uygun değildir.</p></section>
 </main>
 <div id="mqttUyari" role="alert"><button type="button" aria-label="Uyarıyı kapat" onclick="document.getElementById('mqttUyari').style.display='none'">×</button><strong>Güvenli bölge dışına çıkıldı.</strong><div>Cihazın konumunu kontrol et.</div></div>
 <nav class="bottom-nav" role="tablist" aria-label="Ana gezinme">
@@ -46,6 +46,9 @@ let sonMqttMesajZamani = 0, sonGecerliMesajZamani = 0;
 let sonGecmisZamani = 0, sonGpsZamani = "";
 let bekleyenHedef = null;
 let sonHedefIstekId = 0;
+const bekleyenKomutlar = new Map();
+let sonGuvenliBolgeBildirimi = 0;
+let uyariSesBaglami = null;
 const mqttTopic = "zelis/gps/test/210826";
 const cihazDurumTopic = "zelis/gps/durum/210826";
 const mqttClientId = "web-gps-" + Math.random().toString(16).slice(2, 10);
@@ -53,11 +56,110 @@ const mqttBaglantisi = mqtt.connect("wss://test.mosquitto.org:8081/mqtt", {
   clientId: mqttClientId, clean: true, connectTimeout: 10000, reconnectPeriod: 3000
 });
 
+function mqttKomutuGonderVeyaBeklet(tur, topic, payload, options, olaylar) {
+  const onceki = bekleyenKomutlar.get(tur);
+  if (onceki) clearTimeout(onceki.zamanAsimi);
+
+  const komut = {
+    topic: topic,
+    payload: payload,
+    options: options || {},
+    bitis: Date.now() + 15000,
+    gonderiliyor: false,
+    zamanAsimi: null,
+    dene: null
+  };
+  bekleyenKomutlar.set(tur, komut);
+
+  komut.dene = function() {
+    if (bekleyenKomutlar.get(tur) !== komut || komut.gonderiliyor) return;
+    if (Date.now() >= komut.bitis || !mqttBaglantisi.connected) return;
+    komut.gonderiliyor = true;
+    mqttBaglantisi.publish(topic, payload, komut.options, function(error) {
+      komut.gonderiliyor = false;
+      if (bekleyenKomutlar.get(tur) !== komut) return;
+      if (error) {
+        if (olaylar.hata) olaylar.hata();
+        setTimeout(komut.dene, 1000);
+        return;
+      }
+      clearTimeout(komut.zamanAsimi);
+      bekleyenKomutlar.delete(tur);
+      if (olaylar.gonderildi) olaylar.gonderildi();
+    });
+  };
+
+  komut.zamanAsimi = setTimeout(function() {
+    if (bekleyenKomutlar.get(tur) !== komut) return;
+    bekleyenKomutlar.delete(tur);
+    if (olaylar.zamanAsimi) olaylar.zamanAsimi();
+  }, 15000);
+
+  if (!mqttBaglantisi.connected && olaylar.bekliyor) olaylar.bekliyor();
+  komut.dene();
+}
+
+function bekleyenMqttKomutlariniGonder() {
+  bekleyenKomutlar.forEach(function(komut) { komut.dene(); });
+}
+
 function alan(id, metin) {
   document.getElementById(id).textContent = metin;
   if (id === "mqttHedefMesafe") document.getElementById("hedefMesafeOzet").textContent = metin;
   if (id === "mqttYaricap") document.getElementById("ayarYaricap").textContent = metin;
 }
+function bildirimAyariniGuncelle() {
+  const durum = document.getElementById("bildirimDurumu");
+  const dugme = document.getElementById("bildirimButton");
+  if (!("Notification" in window)) {
+    durum.textContent = "iPhone’da sistem bildirimi için sayfayı Ana Ekran’a eklemek gerekir. Sayfa açıkken kırmızı uyarı yine gösterilir.";
+    dugme.textContent = "Bildirim desteği bilgisi";
+    return;
+  }
+  if (Notification.permission === "granted" && localStorage.getItem("guvenliBolgeBildirimi") === "acik") {
+    durum.textContent = "✅ Bildirimler açık.";
+    dugme.textContent = "Bildirimler açık";
+  } else if (Notification.permission === "denied") {
+    durum.textContent = "Bildirim izni kapalı. Telefonun tarayıcı ayarlarından izin vermen gerekir.";
+  } else {
+    durum.textContent = "Henüz bildirim izni verilmedi.";
+  }
+}
+async function bildirimleriAc() {
+  try {
+    const SesBaglami = window.AudioContext || window.webkitAudioContext;
+    if (SesBaglami && !uyariSesBaglami) uyariSesBaglami = new SesBaglami();
+    if (uyariSesBaglami && uyariSesBaglami.state === "suspended") await uyariSesBaglami.resume();
+    if (!("Notification" in window)) {
+      bildirimAyariniGuncelle();
+      return;
+    }
+    const izin = await Notification.requestPermission();
+    if (izin === "granted") localStorage.setItem("guvenliBolgeBildirimi", "acik");
+    bildirimAyariniGuncelle();
+  } catch (error) {
+    alan("bildirimDurumu", "Bildirim izni açılamadı. Tarayıcı ayarlarını kontrol edin.");
+  }
+}
+function guvenliBolgeUyarisiGoster() {
+  const uyari = document.getElementById("mqttUyari");
+  uyari.style.display = "block";
+  if (Date.now() - sonGuvenliBolgeBildirimi < 30000) return;
+  sonGuvenliBolgeBildirimi = Date.now();
+  if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([300, 150, 300]);
+  if (uyariSesBaglami && uyariSesBaglami.state === "running") {
+    const ses = uyariSesBaglami.createOscillator();
+    const sesSeviyesi = uyariSesBaglami.createGain();
+    ses.frequency.value = 880; sesSeviyesi.gain.value = 0.08;
+    ses.connect(sesSeviyesi); sesSeviyesi.connect(uyariSesBaglami.destination);
+    ses.start(); ses.stop(uyariSesBaglami.currentTime + 0.35);
+  }
+  if ("Notification" in window && Notification.permission === "granted" &&
+      localStorage.getItem("guvenliBolgeBildirimi") === "acik") {
+    new Notification("Güvenli bölge uyarısı", { body: "ESP32 güvenli bölgenin dışına çıktı." });
+  }
+}
+bildirimAyariniGuncelle();
 function hedefOnayiniIsle(veri) {
   const koordinatlarGecerli = typeof veri.hedef_enlem === "number" && Number.isFinite(veri.hedef_enlem) &&
     Math.abs(veri.hedef_enlem) <= 90 && typeof veri.hedef_boylam === "number" &&
@@ -106,6 +208,7 @@ mqttBaglantisi.on("connect", function() {
   sonMqttMesajZamani = Date.now();
   baglantiYaz("🟢 MQTT aktif; ESP32 verisi bekleniyor", "#188038");
   mqttBaglantisi.subscribe([mqttTopic, cihazDurumTopic]);
+  bekleyenMqttKomutlariniGonder();
 });
 mqttBaglantisi.on("reconnect", baglantiKesildi);
 mqttBaglantisi.on("close", baglantiKesildi);
@@ -173,7 +276,7 @@ mqttBaglantisi.on("message", function(topic, gelenMesaj, packet) {
       veri.durum === "guvenli_bolge_disi" ? "❌ Dışında" : "Kontrol edilemiyor");
     const uyari = document.getElementById("mqttUyari");
     if (!uygun || veri.durum === "guvenli_bolge_icinde") uyari.style.display = "none";
-    else if (veri.yeni_uyari === true && veri.durum === "guvenli_bolge_disi") uyari.style.display = "block";
+    else if (veri.yeni_uyari === true && veri.durum === "guvenli_bolge_disi") guvenliBolgeUyarisiGoster();
     if (veri.gps_zamani !== sonGpsZamani && (!sonGecmisZamani || Date.now() - sonGecmisZamani >= 10000)) {
       try { mqttKonumunuGecmiseEkle(veri); } catch (e) { console.warn("Geçmiş kaydedilemedi", e); }
       sonGecmisZamani = Date.now(); sonGpsZamani = veri.gps_zamani;
@@ -258,25 +361,28 @@ metreSayisi < 20 || metreSayisi > 1000000
   const guvenliBolgeTopic =
     "zelis/gps/komut/210826/guvenli-bolge";
 
-  if (!mqttBaglantisi.connected) {
-    mesaj.innerHTML =
-      "❌ MQTT bağlantısı aktif değil.";
-    return;
-  }
-
   document.getElementById("guvenliBolgeSec").dataset.dirty = "";
   const ayarMesaji = JSON.stringify({
     metre: metreSayisi
   });
 
-  mqttBaglantisi.publish(
+  mqttKomutuGonderVeyaBeklet(
+    "guvenli-bolge",
     guvenliBolgeTopic,
     ayarMesaji,
-    function(error) {
-      if (error) {
+    { qos: 1, retain: false },
+    {
+      bekliyor: function() {
+        mesaj.innerHTML = "⏳ MQTT bağlantısı bekleniyor; bağlanınca yarıçap otomatik gönderilecek.";
+      },
+      hata: function() {
+        mesaj.innerHTML = "⏳ Gönderim yeniden deneniyor…";
+      },
+      zamanAsimi: function() {
         mesaj.innerHTML =
-          "❌ Güvenli bölge ayarı gönderilemedi.";
-      } else {
+          "❌ MQTT bağlantısı kurulamadı; güvenli bölge ayarı gönderilmedi.";
+      },
+      gonderildi: function() {
         mesaj.innerHTML =
           "✅ Güvenli bölge " +
           metre +
@@ -558,11 +664,6 @@ function secilenHedefiKaydet() {
     return;
   }
 
-  if (!mqttBaglantisi.connected) {
-    alert("MQTT bağlantısı aktif değil.");
-    return;
-  }
-
   const hedefTopic =
     "zelis/gps/komut/210826/hedef";
 
@@ -573,12 +674,6 @@ function secilenHedefiKaydet() {
     lat: secilenHedefLat, lon: secilenHedefLon, timer: null
   };
   bekleyenHedef = istek;
-  alan("hedefKayitDurumu", "⏳ Hedef gönderiliyor; ESP32 kayıt onayı bekleniyor…");
-  istek.timer = setTimeout(function() {
-    if (bekleyenHedef === istek) {
-      alan("hedefKayitDurumu", "⚠️ ESP32 kayıt onayı henüz gelmedi. Bağlantıyı kontrol edin; hedefin kaydedildiği kesinleşmedi.");
-    }
-  }, 15000);
   const hedefMesaji = JSON.stringify({
     istek_id: istek.id,
     enlem: secilenHedefLat,
@@ -586,18 +681,32 @@ function secilenHedefiKaydet() {
     adres: secilenHedefAdres
   });
 
-  mqttBaglantisi.publish(
+  alan("hedefKayitDurumu", "⏳ Hedef gönderiliyor; ESP32 kayıt onayı bekleniyor…");
+  mqttKomutuGonderVeyaBeklet(
+    "hedef",
     hedefTopic,
     hedefMesaji,
     { qos: 1, retain: false },
-    function(error) {
-      if (bekleyenHedef !== istek) return;
-      if (error) {
-        clearTimeout(istek.timer);
+    {
+      bekliyor: function() {
+        alan("hedefKayitDurumu", "⏳ MQTT bağlantısı bekleniyor; bağlanınca hedef otomatik gönderilecek.");
+      },
+      hata: function() {
+        if (bekleyenHedef === istek) alan("hedefKayitDurumu", "⏳ Hedef gönderimi yeniden deneniyor…");
+      },
+      zamanAsimi: function() {
+        if (bekleyenHedef !== istek) return;
         bekleyenHedef = null;
-        alan("hedefKayitDurumu", "❌ Hedef gönderilemedi; kayıt doğrulanmadı.");
-      } else {
+        alan("hedefKayitDurumu", "❌ MQTT bağlantısı kurulamadı; hedef gönderilmedi.");
+      },
+      gonderildi: function() {
+        if (bekleyenHedef !== istek) return;
         alan("hedefKayitDurumu", "⏳ Hedef MQTT ile gönderildi; ESP32 kayıt onayı bekleniyor…");
+        istek.timer = setTimeout(function() {
+          if (bekleyenHedef === istek) {
+            alan("hedefKayitDurumu", "⚠️ ESP32 kayıt onayı henüz gelmedi. Bağlantıyı kontrol edin; hedefin kaydedildiği kesinleşmedi.");
+          }
+        }, 15000);
       }
     }
   );
