@@ -668,9 +668,8 @@
           <div id="kayitliYerlerListesi">
             <p class="fineprint">Henüz kayıtlı yer yok.</p>
           </div>
-          <button type="button" class="secondary space" onclick="acikHedefiKaydet()">
-            Bu hedefi kaydet
-          </button>
+          <button type="button" class="secondary space" onclick="kayitliYerEklemeBaslat()" Yeni kayıtlı yer ekle
+            </button>
         </div>
 
         <button type="button" class="primary" id="hedefBelirleButton" onclick="hedefAlaniniAc()">Hedef
@@ -768,6 +767,7 @@
     let sonMqttMesajZamani = 0, sonGecerliMesajZamani = 0;
     let sonGecmisZamani = 0, sonGpsZamani = "";
     let bekleyenHedef = null;
+    let hedefSecimModu = "anlik";
     let sonHedefIstekId = 0;
     const bekleyenKomutlar = new Map();
     let sonGuvenliBolgeBildirimi = 0;
@@ -1306,7 +1306,11 @@
       document.getElementById("guvenliBolgeButton").style.display = "inline-block";
     }
 
-    function hedefAlaniniAc() {
+    function kayitliYerEklemeBaslat() {
+      hedefAlaniniAc("kayitli");
+    }
+    function hedefAlaniniAc(mod = "anlik") {
+      hedefSecimModu = mod;
       document.getElementById("hedefSecimAlani").style.display = "block";
       document.getElementById("hedefBelirleButton").style.display = "none";
       document.getElementById("hedefArama").focus();
@@ -1443,7 +1447,7 @@
 
       document.getElementById("hedefOnay").innerHTML =
         "<br><button onclick='secilenHedefiKaydet()'>" +
-        "✅ Bu hedefi kaydet</button>";
+        "✅ Seçimi onayla</button>";
 
     }
 
@@ -1453,6 +1457,11 @@
         secilenHedefLon === null
       ) {
         alert("Önce bir hedef seçin.");
+        return;
+      }
+
+      if (hedefSecimModu === "kayitli") {
+        acikHedefiKaydet();
         return;
       }
 
@@ -1547,6 +1556,12 @@
       );
 
       kayitliYerleriGoster();
+      alan(
+        "hedefKayitDurumu",
+        "✅ " + ad.trim() + " kayıtlı yerlere eklendi."
+      );
+      hedefSecimModu = "anlik";
+      hedefAlaniniKapat();
     }
 
     function kayitliYeriHedefYap(sira) {
@@ -1716,7 +1731,7 @@
           ).innerHTML =
             "<br><button onclick=" +
             "'secilenHedefiKaydet()'>" +
-            "✅ Bu hedefi kaydet</button>";
+            "✅ Seçimi onayla</button>";
         });
       }
 
