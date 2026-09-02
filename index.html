@@ -661,7 +661,19 @@
         <div class="panel"><span class="eyebrow">Cihazdaki hedef kaydı</span>
           <p id="mqttHedefKaydi" role="status">ESP32 bilgisi bekleniyor</p><span class="eyebrow">Hedefe
             kalan</span><strong id="hedefMesafeOzet">Güncel GPS konumu yok</strong>
-        </div><button type="button" class="primary" id="hedefBelirleButton" onclick="hedefAlaniniAc()">Hedef
+        </div>
+
+        <div class="panel" id="kayitliYerlerPaneli">
+          <h3>Kayıtlı yerler</h3>
+          <div id="kayitliYerlerListesi">
+            <p class="fineprint">Henüz kayıtlı yer yok.</p>
+          </div>
+          <button type="button" class="secondary space" onclick="acikHedefiKaydet()">
+            Bu hedefi kaydet
+          </button>
+        </div>
+
+        <button type="button" class="primary" id="hedefBelirleButton" onclick="hedefAlaniniAc()">Hedef
           belirle</button>
         <div id="hedefSecimAlani" class="panel" style="display:none">
           <div class="close-row">
@@ -1492,6 +1504,134 @@
       );
     }
 
+    const KAYITLI_YERLER_ANAHTARI = "kayitliYerler";
+
+    function kayitliYerleriOku() {
+      try {
+        const yerler = JSON.parse(
+          localStorage.getItem(KAYITLI_YERLER_ANAHTARI) || "[]"
+        );
+        return Array.isArray(yerler) ? yerler : [];
+      } catch (hata) {
+        return [];
+      }
+    }
+
+    function acikHedefiKaydet() {
+      if (
+        secilenHedefLat === null ||
+        secilenHedefLon === null
+      ) {
+        alert("Önce Hedef belirle bölümünden bir yer seçin.");
+        return;
+      }
+
+      const ad = prompt(
+        "Bu yere hangi adı vermek istersiniz?",
+        "Ev"
+      );
+
+      if (!ad || !ad.trim()) return;
+
+      const yerler = kayitliYerleriOku();
+      yerler.push({
+        ad: ad.trim(),
+        lat: secilenHedefLat,
+        lon: secilenHedefLon,
+        adres: secilenHedefAdres
+      });
+
+      localStorage.setItem(
+        KAYITLI_YERLER_ANAHTARI,
+        JSON.stringify(yerler)
+      );
+
+      kayitliYerleriGoster();
+    }
+
+    function kayitliYeriHedefYap(sira) {
+      const yer = kayitliYerleriOku()[sira];
+      if (!yer) return;
+
+      secilenHedefLat = yer.lat;
+      secilenHedefLon = yer.lon;
+      secilenHedefAdres = yer.ad + " · " + yer.adres;
+
+      localStorage.setItem(
+        "secilenHedefAdres",
+        secilenHedefAdres
+      );
+
+      secilenHedefiKaydet();
+    }
+
+    function kayitliYeriSil(sira) {
+      const yerler = kayitliYerleriOku();
+      if (!yerler[sira]) return;
+
+      if (!confirm(yerler[sira].ad + " silinsin mi?")) return;
+
+      yerler.splice(sira, 1);
+      localStorage.setItem(
+        KAYITLI_YERLER_ANAHTARI,
+        JSON.stringify(yerler)
+      );
+
+      kayitliYerleriGoster();
+    }
+
+    function kayitliYerleriGoster() {
+      const liste = document.getElementById(
+        "kayitliYerlerListesi"
+      );
+
+      if (!liste) return;
+
+      const yerler = kayitliYerleriOku();
+      liste.innerHTML = "";
+
+      if (yerler.length === 0) {
+        const bosMesaj = document.createElement("p");
+        bosMesaj.className = "fineprint";
+        bosMesaj.textContent = "Henüz kayıtlı yer yok.";
+        liste.appendChild(bosMesaj);
+        return;
+      }
+
+      yerler.forEach(function (yer, sira) {
+        const satir = document.createElement("div");
+        satir.className = "detail-row";
+
+        const ad = document.createElement("span");
+        ad.textContent = "📍 " + yer.ad;
+
+        const dugmeler = document.createElement("div");
+        dugmeler.style.display = "flex";
+        dugmeler.style.gap = "6px";
+
+        const hedefDugmesi = document.createElement("button");
+        hedefDugmesi.type = "button";
+        hedefDugmesi.textContent = "Hedef yap";
+        hedefDugmesi.onclick = function () {
+          kayitliYeriHedefYap(sira);
+        };
+
+        const silDugmesi = document.createElement("button");
+        silDugmesi.type = "button";
+        silDugmesi.textContent = "Sil";
+        silDugmesi.onclick = function () {
+          kayitliYeriSil(sira);
+        };
+
+        dugmeler.appendChild(hedefDugmesi);
+        dugmeler.appendChild(silDugmesi);
+        satir.appendChild(ad);
+        satir.appendChild(dugmeler);
+        liste.appendChild(satir);
+      });
+    }
+
+    setTimeout(kayitliYerleriGoster, 0);
     let harita;
     let hedefMarker;
     let secilenHedefLat = null;
