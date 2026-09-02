@@ -190,6 +190,21 @@ function guvenliBolgeUyarisiGoster() {
   uyari.style.display = "block";
   if (Date.now() - sonGuvenliBolgeBildirimi < 30000) return;
   sonGuvenliBolgeBildirimi = Date.now();
+  if (
+  typeof Notification !== "undefined" &&
+  Notification.permission === "granted" &&
+  "serviceWorker" in navigator
+) {
+  navigator.serviceWorker.ready.then(function(kayit) {
+    kayit.showNotification("Güvenli bölge uyarısı", {
+      body: "ESP32 güvenli bölgenin dışına çıktı.",
+      icon: "/esp32-konum/ikon-192.png",
+      badge: "/esp32-konum/ikon-192.png",
+      tag: "guvenli-bolge-uyarisi",
+      renotify: true
+    });
+  });
+}
   if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate([300, 150, 300]);
   if (uyariSesBaglami && uyariSesBaglami.state === "running") {
     const ses = uyariSesBaglami.createOscillator();
