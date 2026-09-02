@@ -305,6 +305,25 @@ mqttBaglantisi.on("message", function(topic, gelenMesaj, packet) {
     alan("gpsDurum", "✅ Geçerli GPS konumu");
     alan("durum", "📍 ESP32’nin GPS konumu otomatik güncelleniyor.");
     const uygun = veri.kontrol_uygun === true;
+    const merkezGecerli =
+  veri.merkez_belirlendi === true &&
+  typeof veri.merkez_enlem === "number" &&
+  Number.isFinite(veri.merkez_enlem) &&
+  typeof veri.merkez_boylam === "number" &&
+  Number.isFinite(veri.merkez_boylam);
+
+if (
+  uygun &&
+  merkezGecerli &&
+  typeof veri.guvenli_yaricap === "number"
+) {
+  guvenliBolgeyiGoster(
+    veri.merkez_enlem,
+    veri.merkez_boylam,
+    veri.guvenli_yaricap,
+    veri.durum
+  );
+}
     alan("mqttMesafe", uygun && typeof veri.mesafe === "number" && veri.mesafe >= 0 ?
       veri.mesafe.toFixed(1) + " metre" : "Ölçüm kalitesi bekleniyor");
     alan("mqttHedefMesafe", !veri.hedef_var ? "Henüz hedef seçilmedi" :
@@ -325,10 +344,10 @@ mqttBaglantisi.on("message", function(topic, gelenMesaj, packet) {
 });
 document.getElementById("guvenliBolgeSec").addEventListener("input", function() { this.dataset.dirty = "1"; });
 setInterval(function() {
-  if (sonGecerliMesajZamani && Date.now() - sonGecerliMesajZamani > 8000) {
+  if (sonGecerliMesajZamani && Date.now() - sonGecerliMesajZamani > 45000) {
     konumuGecersizYap("GPS ölçümü güncellenmiyor.");
   }
-  if (sonMqttMesajZamani && Date.now() - sonMqttMesajZamani > 15000) {
+  if (sonMqttMesajZamani && Date.now() - sonMqttMesajZamani > 70000) {
     baglantiYaz("🟠 ESP32’den yeni veri alınamıyor", "#d97706");
     alan("mqttHedefKaydi", "ESP32 verisi yok; kayıt durumu doğrulanamıyor");
     konumuGecersizYap("ESP32 verisi kesildi; güncel konum yok.");
@@ -847,7 +866,7 @@ function hedefSec() {
   
 </script>
 <script>
-let canliHarita = null, canliMarker = null, aktifEkran = "harita";
+let canliHarita = null, canliMarker = null, guvenliBolgeDairesi = null, guvenliMerkezMarker = null, aktifEkran = "harita";
 function canliHaritayiHazirla() {
   if (canliHarita || typeof L === "undefined") {
     if (typeof L === "undefined") document.getElementById("haritaHata").hidden = false;
@@ -862,6 +881,58 @@ function canliHaritayiHazirla() {
     tiles.on("tileerror",()=>document.getElementById("haritaHata").hidden=false);
     tiles.on("tileload",()=>document.getElementById("haritaHata").hidden=true);
   } catch(e) { document.getElementById("haritaHata").hidden=false; }
+}
+
+  function guvenliBolgeyiGoster(merkezLat, merkezLon, yaricap, durum) {
+  canliHaritayiHazirla();
+  if (!canliHarita) return;
+
+  const disarida = durum === "guvenli_bolge_disi";
+  const renk = disarida ? "#d93025" : "#188038";
+  const durumMetni = disarida ? "Dışında" : "İçinde";
+  const ilkCizim = !guvenliBolgeDairesi;
+
+  if (!guvenliBolgeDairesi) {
+    guvenliBolgeDairesi = L.circle([merkezLat, merkezLon], {
+      radius: yaricap,
+      color: renk,
+      weight: 3,
+      fillColor: renk,
+      fillOpacity: 0.14
+    }).addTo(canliHarita);
+  } else {
+    guvenliBolgeDairesi.setLatLng([merkezLat, merkezLon]);
+    guvenliBolgeDairesi.setRadius(yaricap);
+    guvenliBolgeDairesi.setStyle({
+      color: renk,
+      fillColor: renk
+    });
+  }
+
+  if (!guvenliMerkezMarker) {
+    guvenliMerkezMarker = L.circleMarker([merkezLat, merkezLon], {
+      radius: 6,
+      color: "#ffffff",
+      weight: 2,
+      fillColor: renk,
+      fillOpacity: 1
+    }).addTo(canliHarita);
+  } else {
+    guvenliMerkezMarker.setLatLng([merkezLat, merkezLon]);
+    guvenliMerkezMarker.setStyle({ fillColor: renk });
+  }
+
+  guvenliBolgeDairesi.bindTooltip(
+    "Güvenli bölge · " + yaricap + " metre · " + durumMetni
+  );
+  guvenliMerkezMarker.bindTooltip("Güvenli merkez");
+
+  if (ilkCizim) {
+    canliHarita.fitBounds(guvenliBolgeDairesi.getBounds(), {
+      padding: [30, 30],
+      maxZoom: 17
+    });
+  }
 }
 function canliKonumuTemizle(metin) {
   if (canliMarker && canliHarita) canliHarita.removeLayer(canliMarker);
