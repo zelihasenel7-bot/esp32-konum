@@ -774,6 +774,18 @@
     let sonGuvenliBolgeBildirimi = 0;
     let uyariSesBaglami = null;
     let oneSignalHazir = false;
+    setInterval(function () {
+      if (
+        sonMqttMesajZamani > 0 &&
+        Date.now() - sonMqttMesajZamani > 70000
+      ) {
+        baglantiYaz(
+          "🔴 ESP32 çevrimdışı; Son veri: " +
+          new Date(sonMqttMesajZamani).toLocaleTimeString("tr-TR"),
+          "#b3261e"
+        );
+      }
+    }, 5000);
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     window.OneSignalDeferred.push(async function (OneSignal) {
       try {
