@@ -1007,7 +1007,11 @@
         const veri = JSON.parse(gelenMesaj.toString());
         if (veri.surum !== 2 || veri.kaynak !== "gps") return;
         sonMqttMesajZamani = Date.now();
-        baglantiYaz("🟢 MQTT aktif; ESP32 verisi geliyor", "#188038");
+        baglantiYaz(
+          "🟢 MQTT aktif; Son veri: " +
+          new Date(sonMqttMesajZamani).toLocaleTimeString("tr-TR"),
+          "#188038"
+        );
         hedefOnayiniIsle(veri);
         alan("gpsUydu", Number.isInteger(veri.uydu) ? veri.uydu : "-");
         alan("gpsHdop", typeof veri.hdop === "number" && Number.isFinite(veri.hdop) ? veri.hdop.toFixed(2) : "-");
