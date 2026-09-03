@@ -1524,7 +1524,11 @@
             alan("hedefKayitDurumu", "⏳ Hedef MQTT ile gönderildi; ESP32 kayıt onayı bekleniyor…");
             istek.timer = setTimeout(function () {
               if (bekleyenHedef === istek) {
-                alan("hedefKayitDurumu", "⚠️ ESP32 kayıt onayı henüz gelmedi. Bağlantıyı kontrol edin; hedefin kaydedildiği kesinleşmedi.");
+                alan(
+                  "hedefKayitDurumu",
+                  "⚠️ ESP32 kayıt onayı henüz gelmedi. Bağlantıyı kontrol edin; hedefin kaydedildiği kesinleşmedi."
+                );
+                bekleyenHedef = null;
               }
             }, 15000);
           }
@@ -1595,6 +1599,11 @@
       ) {
         alert("Önce Hedef belirle bölümünden bir yer seçin.");
         return;
+      }
+
+      if (bekleyenHedef) {
+        clearTimeout(bekleyenHedef.timer);
+        bekleyenHedef = null;
       }
 
       const ad = prompt(
