@@ -675,6 +675,9 @@
 
         <button type="button" class="primary" id="hedefBelirleButton" onclick="hedefAlaniniAc()">Hedef
           belirle</button>
+        <button type="button" class="secondary space" onclick="aktifHedefiKaldir()">
+          Aktif hedefi kaldır
+        </button>
         <div id="hedefSecimAlani" class="panel" style="display:none">
           <div class="close-row">
             <h3>Yeni hedef</h3><button type="button" class="close" aria-label="Hedef seçimini kapat"
@@ -1541,6 +1544,49 @@
         return [];
       }
     }
+
+    function aktifHedefiKaldir() {
+      if (!confirm("Aktif hedef kaldırılsın mı?")) return;
+
+      const hedefTopic = "zelis/gps/komut/210826/hedef";
+      const silmeMesaji = JSON.stringify({sil: true});
+
+      alan("hedefKayitDurumu", "⏳ Aktif hedef kaldırılıyor...");
+
+      mqttKomutuGonderVeyaBeklet(
+        "hedef",
+        hedefTopic,
+        silmeMesaji,
+        {qos: 1, retain: false},
+        {
+          bekliyor: function () {
+            alan(
+              "hedefKayitDurumu",
+              "⏳ MQTT bağlantısı bekleniyor; kaldırma komutu otomatik gönderilecek."
+            );
+          },
+          hata: function () {
+            alan(
+              "hedefKayitDurumu",
+              "❌ Aktif hedef kaldırılamadı; yeniden deneyin."
+            );
+          },
+          zamanAsimi: function () {
+            alan(
+              "hedefKayitDurumu",
+              "⚠️ ESP32 yanıtı bekleniyor; bağlantıyı kontrol edin."
+            );
+          },
+          gonderildi: function () {
+            alan(
+              "hedefKayitDurumu",
+              "✅ Aktif hedefi kaldırma komutu gönderildi."
+            );
+          }
+        }
+      );
+    }
+
 
     function acikHedefiKaydet() {
       if (
