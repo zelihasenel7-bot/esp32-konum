@@ -999,7 +999,13 @@
         if (gelenMesaj.toString() === "cevrimdisi") {
           alan("mqttHedefKaydi", "ESP32 çevrimdışı; kayıt durumu doğrulanamıyor");
           konumuGecersizYap("ESP32 çevrimdışı; güncel konum yok.");
-          baglantiYaz("🟠 ESP32 çevrimdışı", "#b26a00");
+          baglantiYaz(
+            sonMqttMesajZamani
+              ? "🟠 ESP32 çevrimdışı; Son veri: " +
+              new Date(sonMqttMesajZamani).toLocaleTimeString("tr-TR")
+              : "🟠 ESP32 çevrimdışı; Henüz veri alınmadı",
+            "#b26a00"
+          );
         }
         return;
       }
